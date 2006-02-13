@@ -1,0 +1,68 @@
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#include <richedit.h>
+#include <commctrl.h>
+#include <tchar.h>
+#include "resource.h"
+
+
+#define BLACK	RGB(0,0,0)
+#define BLUE	RGB(0,0,175)
+#define GREEN	RGB(0,135,0)
+#define CYAN	RGB(0,175,175)
+#define RED		RGB(175,0,0)
+#define MAGENTA	RGB(150,0,150)
+#define YELLOW	RGB(175,175,0)
+#define WHITE	RGB(255,255,255)
+
+
+void MainDialogFireCommand();
+
+
+
+// Globally shared variables
+
+extern HINSTANCE G_hInstance;
+
+extern HWND      G_hWnd;
+
+
+const int ID_TOOLBAR = 6055;
+const int ID_STATUS = 6056;
+const int ID_EXPAND = 6057;
+const int ID_ENTER = 6058;
+
+int inline TwipToPoint(int x){return x / 20;}
+int inline PointToTwip(int x){return x * 20;}
+
+
+
+
+
+// From MainDialog
+
+enum es
+
+{
+
+	esCompiling,
+
+	esRunning,
+
+	esFinished
+
+};
+
+
+
+void ShowMainDialog();
+
+void ExecuteStage(es Stage);
+
+void ExecutionComplete();
+
+
+// From Execute
+
+void Execute(LPCTSTR Command);
+
