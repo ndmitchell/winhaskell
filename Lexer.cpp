@@ -1,12 +1,12 @@
 #include "Header.h"
 #include "Lexer.h"
 
-LPCTSTR SingleChars = ",@()[]{}`";
+LPCTSTR SingleChars = ",()[]{}`";
 
-LPCTSTR OpChars = "=<>-:.";
+LPCTSTR OpChars = "!#$%&*+./<=>?@\\^|-~:";
 
 LPCTSTR Operators[] = {
-    "=", "<-", "->", "::", "..", "|", "!", "_", "~", NULL
+    "=", "@", "<-", "->", "::", "..", "|", "!", "~", NULL
 };
 
 LPCTSTR Keywords[] = {
