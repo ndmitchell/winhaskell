@@ -1,6 +1,7 @@
 #include "Header.h"
 #include "Input.h"
 #include "History.h"
+#include "Lexer.h"
 
 TCHAR* Buffer = NULL;
 HWND hInput;
@@ -11,7 +12,7 @@ void InputInit(HWND hInput)
 
     //make it all protected
 	//might want to enable SELCHANGE later, to reduce SETSEL calls
-    SendMessage(hInput, EM_SETEVENTMASK, 0, ENM_KEYEVENTS | ENM_SELCHANGE);
+    SendMessage(hInput, EM_SETEVENTMASK, 0, ENM_KEYEVENTS | ENM_SELCHANGE | ENM_CHANGE);
 
 	CHARFORMAT cf;
     cf.cbSize = sizeof(CHARFORMAT);
@@ -35,6 +36,45 @@ LPCTSTR InputGet()
 	else
 		GetWindowText(hInput, Buffer, Size+1);
 	return Buffer;
+}
+
+void InputChanged()
+{
+    CHARRANGE cr;
+    SendMessage(hInput, EM_EXGETSEL, 0, (LPARAM) &cr);
+
+    int Length = GetWindowTextLength(hInput);
+    TCHAR* Buffer = new TCHAR[Length+2];
+    GetWindowText(hInput, Buffer, Length+1);
+
+    CHARFORMAT cf;
+    cf.cbSize = sizeof(cf);
+    cf.dwMask = CFM_COLOR;
+    cf.dwEffects = 0;
+
+    int Pos = 0;
+    while (Buffer[Pos] != 0)
+    {
+        int LastPos = Pos;
+        Lexeme l = GetLexeme(Buffer, &Pos);
+        SendMessage(hInput, EM_SETSEL, LastPos, Pos);
+
+        if (l != LexSpace)
+        {
+            if (l == LexKeyword)
+                cf.crTextColor = BLUE;
+            else if (l == LexOperator)
+                cf.crTextColor = RED;
+            else if (l == LexString)
+                cf.crTextColor = CYAN;
+            else
+                cf.crTextColor = BLACK;
+            SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+        }
+    }
+
+    delete[] Buffer;
+    SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);
 }
 
 BOOL InputNotify(NMHDR* nmhdr)

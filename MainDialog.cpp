@@ -217,7 +217,7 @@ void FlipExpand()
 
 }
 
-void MainDialogCommand(int ID)
+void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 {
 	switch (ID)
 	{
@@ -232,6 +232,11 @@ void MainDialogCommand(int ID)
 	case ID_STOP:
 		AbortExecution();
 		break;
+
+    case rtfInput:
+        if (HIWORD(wParam) == EN_CHANGE)
+            InputChanged();
+        break;
 
 	case ID_EXPAND:
 		FlipExpand();
@@ -286,7 +291,7 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	    break;
 
 	case WM_COMMAND:
-		MainDialogCommand(LOWORD(wParam));
+		MainDialogCommand(LOWORD(wParam), wParam, lParam);
 		break;
 
 	case WM_NOTIFY:

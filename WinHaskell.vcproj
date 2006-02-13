@@ -121,6 +121,9 @@
 				RelativePath=".\Input.cpp">
 			</File>
 			<File
+				RelativePath=".\Lexer.cpp">
+			</File>
+			<File
 				RelativePath=".\MainDialog.cpp">
 			</File>
 			<File
@@ -154,6 +157,9 @@
 			</File>
 			<File
 				RelativePath=".\Input.h">
+			</File>
+			<File
+				RelativePath=".\Lexer.h">
 			</File>
 			<File
 				RelativePath=".\Output.h">
@@ -203,10 +209,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">

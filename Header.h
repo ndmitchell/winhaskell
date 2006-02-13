@@ -9,7 +9,7 @@
 #define BLACK	RGB(0,0,0)
 #define BLUE	RGB(0,0,175)
 #define GREEN	RGB(0,135,0)
-#define CYAN	RGB(0,175,175)
+#define CYAN	RGB(0,128,128)
 #define RED		RGB(175,0,0)
 #define MAGENTA	RGB(150,0,150)
 #define YELLOW	RGB(175,175,0)
