@@ -6,7 +6,7 @@ LPCTSTR SingleChars = ",()[]{}`";
 LPCTSTR OpChars = "!#$%&*+./<=>?@\\^|-~:";
 
 LPCTSTR Operators[] = {
-    "=", "@", "<-", "->", "::", "..", "|", "!", "~", NULL
+    "=", "@", "<-", "->", "::", "..", "|", "!", "~", "\\", NULL
 };
 
 LPCTSTR Keywords[] = {
