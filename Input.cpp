@@ -81,10 +81,10 @@ void InputChanged()
 
     //Now make all mismatched brackets bold
     MismatchedBrackets(Buffer);
+    cf.dwEffects = CFE_BOLD;
+	cf.crTextColor = BRIGHTRED;
     for (int i = 0; i < Length; i++)
     {
-        cf.dwMask = CFM_BOLD;
-        cf.dwEffects = CFE_BOLD;
         if (Buffer[i] == 0)
         {
             SendMessage(hInput, EM_SETSEL, i, i+1);

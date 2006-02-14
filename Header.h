@@ -11,6 +11,7 @@
 #define GREEN	RGB(0,135,0)
 #define CYAN	RGB(0,128,128)
 #define RED		RGB(175,0,0)
+#define BRIGHTRED RGB(255,0,0)
 #define MAGENTA	RGB(150,0,150)
 #define YELLOW	RGB(175,175,0)
 #define WHITE	RGB(255,255,255)
