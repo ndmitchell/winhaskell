@@ -176,7 +176,8 @@ void FireCommand()
 	strcpy(Buffer, Command);
 	strcat(Buffer, "\n");
 
-	OutputAppend(Buffer);
+	OutputCopy(GetDlgItem(G_hWnd, rtfInput));
+    OutputAppend("\n");
 
 	ExecuteStage(esRunning);
 

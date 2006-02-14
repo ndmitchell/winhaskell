@@ -347,3 +347,26 @@ void OutputAppend(LPCTSTR Text)
 	//	SendMessage(hRTF, EM_SETSEL, -1, -1);
 	//  SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Text);
 }
+
+void OutputCopy(HWND hCopy)
+{
+    int Length = GetWindowTextLength(hCopy);
+    LPTSTR Buffer = new TCHAR[Length+2];
+    GetWindowText(hCopy, Buffer, Length+1);
+
+    CHARFORMAT cf;
+    cf.cbSize = sizeof(cf);
+    cf.dwMask = CFM_BOLD | CFM_COLOR;
+
+    TCHAR Buf2[2];
+    Buf2[1] = 0;
+
+    for (int i = 0; i < Length; i++)
+    {
+        Buf2[0] = Buffer[i];
+        SendMessage(hCopy, EM_SETSEL, i, i+1);
+        SendMessage(hCopy, EM_GETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+        SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+        SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Buf2);
+    }
+}
