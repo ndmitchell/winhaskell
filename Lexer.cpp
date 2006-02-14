@@ -121,6 +121,13 @@ LPTSTR ScanBrackets(LPTSTR Buffer, bool Expecting)
 {
     for (; *Buffer != 0; Buffer++)
     {
+		int Str = CountString(Buffer);
+		if (Str != 0)
+		{
+			Buffer += Str-1;
+			continue;
+		}
+
         int OpenPos = FindPos(OpenBracket, *Buffer);
         int ShutPos = FindPos(ShutBracket, *Buffer);
 
