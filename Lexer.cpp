@@ -104,3 +104,54 @@ Lexeme GetLexeme(LPCTSTR Buffer, int* Pos)
     return Res;
 }
 
+LPCTSTR OpenBracket = "([{";
+LPCTSTR ShutBracket = ")]}";
+
+int FindPos(LPCTSTR s, TCHAR c)
+{
+    for (int i = 0; s[i] != 0; i++)
+    {
+        if (s[i] == c)
+            return i;
+    }
+    return -1;
+}
+
+LPTSTR ScanBrackets(LPTSTR Buffer, bool Expecting)
+{
+    for (; *Buffer != 0; Buffer++)
+    {
+        int OpenPos = FindPos(OpenBracket, *Buffer);
+        int ShutPos = FindPos(ShutBracket, *Buffer);
+
+        if (ShutPos != -1)
+        {
+            if (Expecting)
+                return Buffer;
+            else
+                *Buffer = 0;
+        }
+        else if (OpenPos != -1)
+        {
+            LPTSTR Res = ScanBrackets(Buffer+1, true);
+            if (Res == NULL)
+            {
+                *Buffer = 0;
+                return NULL;
+            }
+            else if (*Res != ShutBracket[OpenPos])
+            {
+                *Buffer = 0;
+                *Res = 0;
+            }
+            Buffer = Res;
+        }
+    }
+    return NULL;
+}
+
+// set all characters which are bad to 1, all others to 0
+void MismatchedBrackets(LPTSTR Buffer)
+{
+    ScanBrackets(Buffer, false);
+}

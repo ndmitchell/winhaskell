@@ -8,3 +8,4 @@ enum Lexeme {
 };
 
 Lexeme GetLexeme(LPCTSTR Buffer, int* Pos);
+void MismatchedBrackets(LPTSTR Buffer);

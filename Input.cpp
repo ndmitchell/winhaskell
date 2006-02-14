@@ -49,9 +49,10 @@ void InputChanged()
 
     CHARFORMAT cf;
     cf.cbSize = sizeof(cf);
-    cf.dwMask = CFM_COLOR;
+    cf.dwMask = CFM_COLOR | CFM_BOLD;
     cf.dwEffects = 0;
 
+    //First do syntax colouring
     int Pos = 0;
     while (Buffer[Pos] != 0)
     {
@@ -69,6 +70,19 @@ void InputChanged()
                 cf.crTextColor = CYAN;
             else
                 cf.crTextColor = BLACK;
+            SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+        }
+    }
+
+    //Now make all mismatched brackets bold
+    MismatchedBrackets(Buffer);
+    for (int i = 0; i < Length; i++)
+    {
+        cf.dwMask = CFM_BOLD;
+        cf.dwEffects = CFE_BOLD;
+        if (Buffer[i] == 0)
+        {
+            SendMessage(hInput, EM_SETSEL, i, i+1);
             SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
         }
     }
