@@ -167,16 +167,16 @@ bool ParseCommand(LPCTSTR Command, LPTSTR Verb, LPTSTR Argument)
 }
 
 
-void FireCommand(LPCTSTR Command)
+void FireCommand()
 {
+    LPCTSTR Command = InputGet();
+
 	int Len = (int) strlen(Command);
 	LPTSTR Buffer = new TCHAR[Len+2];
 	strcpy(Buffer, Command);
 	strcat(Buffer, "\n");
 
-	OutputBold(true);
 	OutputAppend(Buffer);
-	OutputBold(false);
 
 	ExecuteStage(esRunning);
 
@@ -197,9 +197,9 @@ void MainDialogFireCommand()
 {
 	LPCTSTR Buffer = InputGet();
 	if (Buffer == NULL)
-		Buffer = ":main";
+        InputSet(":main");
 
-	FireCommand(Buffer);
+	FireCommand();
 }
 
 void FlipExpand()
@@ -223,10 +223,6 @@ void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 	{
 	case ID_RUN:
 		MainDialogFireCommand();
-		break;
-
-	case ID_REFRESH:
-		FireCommand(":reload");
 		break;
 
 	case ID_STOP:
@@ -270,7 +266,8 @@ void MainDialogDropFiles(HDROP hDrop)
     //SetWorkingDir(File);
 
     wsprintf(Command, ":load \"%s\"", File);
-    FireCommand(Command);
+    InputSet(Command);
+    FireCommand();
 }
 
 INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

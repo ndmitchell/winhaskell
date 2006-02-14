@@ -38,6 +38,11 @@ LPCTSTR InputGet()
 	return Buffer;
 }
 
+void InputSet(LPCTSTR Buffer)
+{
+    SetWindowText(hInput, Buffer);
+}
+
 void InputChanged()
 {
     CHARRANGE cr;
