@@ -28,7 +28,31 @@ void CreateHiddenConsole()
 
 	AllocConsole();
 	SetConsoleTitle(Buffer);
-	ShowWindow(FindWindow(NULL, Buffer), SW_HIDE);
+
+	/*
+	//Has the potential to work, but doesn't quite
+	RECT rc;
+	BOOL Res = GetWindowRect(G_hWnd, &rc);
+
+	SMALL_RECT src;
+	src.Top = 0; //rc.top;
+	src.Left = 0; //rc.left;
+	src.Right = 0; //rc.right; //src.Left+100;
+	src.Bottom = 0; //rc.bottom; //src.Top+100;
+	BOOL Res2 = SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &src);
+	*/
+
+	//Bound the wait at 1 second, in case something goes wrong
+	for (int i = 0; i < 10; i++)
+	{
+		Sleep(100);
+		HWND hWnd = FindWindow(NULL, Buffer);
+		if (hWnd != NULL)
+		{
+			ShowWindow(hWnd, SW_HIDE);
+			break;
+		}
+	}
 }
 
 bool InitWrapper()
