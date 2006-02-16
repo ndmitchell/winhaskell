@@ -6,6 +6,7 @@
 #include "Toolbar.h"
 #include "RecentFiles.h"
 #include "Registry.h"
+#include "Lexer.h"
 
 const int ToolbarHeight = 46;
 
@@ -143,29 +144,6 @@ void MainDialogInit()
 
 	InitWrapper();
 }
-
-bool ParseCommand(LPCTSTR Command, LPTSTR Verb, LPTSTR Argument)
-{
-	for (int i = 0; isspace(Command[i]); i++)
-		; //nothing
-	if (Command[i] != ':')
-		return false;
-	i++;
-	strcpy(Verb, &Command[i]);
-	for (i = 0; Verb[i] != 0 && !isspace(Verb[i]); i++)
-		; //nothing
-	if (Verb[i] == 0)
-	    Argument[0] = 0;
-	else
-	{
-	    Verb[i] = 0;
-	    for (i++; isspace(Verb[i]); i++)
-		    ; //nothing
-	    strcpy(Argument, &Verb[i]);
-	}
-	return true;
-}
-
 
 void FireCommand()
 {
