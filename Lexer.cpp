@@ -74,6 +74,15 @@ Lexeme GetLexeme(LPCTSTR Buffer, int* Pos)
         goto Return;
     }
 
+    if (*Pos == 0 && *c == ':')
+    {
+        Res = LexCommand;
+        c++;
+        while (*c != 0 && !IsSpace(*c))
+            c++;
+        goto Return;
+    }
+
     int Len = CountString(c);
     if (Len != 0)
     {

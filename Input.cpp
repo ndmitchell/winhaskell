@@ -65,6 +65,7 @@ void InputChanged()
         Lexeme l = GetLexeme(Buffer, &Pos);
         SendMessage(hInput, EM_SETSEL, LastPos, Pos);
 
+        cf.dwEffects = 0;
         if (l == LexKeyword)
             cf.crTextColor = BLUE;
         else if (l == LexOperator)
@@ -72,7 +73,11 @@ void InputChanged()
         else if (l == LexString)
             cf.crTextColor = CYAN;
         else
+        {
             cf.crTextColor = BLACK;
+            if (l == LexCommand)
+                cf.dwEffects = CFE_BOLD;
+        }
         SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
     }
 
