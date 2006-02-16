@@ -111,6 +111,16 @@ BOOL ToolbarNotify(LPNMHDR nmhdr)
 			TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
 			pt.x, pt.y, 0, G_hWnd, NULL);
 	}
+    else if (nmhdr->code == TTN_GETDISPINFO)
+    {
+        LPTOOLTIPTEXT tt = (LPTOOLTIPTEXT) nmhdr;
+        tt->hinst = NULL;
+        for (int i = 0; Buttons[i] != 0; i++)
+        {
+            if (Buttons[i] == nmhdr->idFrom)
+                strcpy(tt->szText, ButtonMsg[i]);
+        }
+    }
 	return FALSE;
 }
 

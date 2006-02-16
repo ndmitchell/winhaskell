@@ -249,7 +249,7 @@ BOOL MainDialogNotify(LPNMHDR nmhdr)
 {
 	if (nmhdr->idFrom == rtfInput)
 		return InputNotify(nmhdr);
-	else if (nmhdr->idFrom == ID_TOOLBAR)
+	else if (nmhdr->idFrom == ID_TOOLBAR || nmhdr->code == TTN_GETDISPINFO)
 		return ToolbarNotify(nmhdr);
 	return FALSE;
 }
