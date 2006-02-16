@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "History.h"
 #include "Lexer.h"
+#include "Commands.h"
 
 TCHAR* Buffer = NULL;
 HWND hInput;
@@ -93,6 +94,13 @@ void InputChanged()
             SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
         }
     }
+
+    //Now give command help if appropriate
+    Commands c = GetCommand(Buffer);
+    if (c != CmdNone)
+        SetStatusBar(GetCommandHelp(c));
+    else
+        SetStatusBar("Type an expression now");
 
     delete[] Buffer;
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);

@@ -18,6 +18,7 @@
 
 
 void MainDialogFireCommand();
+void SetStatusBar(LPCTSTR Text);
 
 
 
