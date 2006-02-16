@@ -86,8 +86,9 @@ Lexeme GetLexeme(LPCTSTR Buffer, int* Pos)
     int Len = CountString(c);
     if (Len != 0)
     {
-        *Pos = *Pos + Len;
-        return LexString;
+        c += Len;
+        Res = LexString;
+        goto Return;
     }
 
     Res = GetType(*c);
