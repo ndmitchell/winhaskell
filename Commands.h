@@ -1,13 +1,10 @@
-enum Commands
+
+struct Command
 {
-    CmdType,
-    CmdLoad,
-    CmdMain,
-    CmdEmpty,
-    CmdUnknown,
-    CmdNone,
+    bool Real;
+    LPCTSTR Name;
+    LPCTSTR Help;
 };
 
-Commands GetCommand(LPCTSTR Cmd);
+Command* GetCommand(LPCTSTR Cmd);
 LPCTSTR GetArgument(LPCTSTR Cmd);
-LPCTSTR GetCommandHelp(Commands Cmd);

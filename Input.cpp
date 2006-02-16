@@ -96,9 +96,9 @@ void InputChanged()
     }
 
     //Now give command help if appropriate
-    Commands c = GetCommand(Buffer);
-    if (c != CmdNone)
-        SetStatusBar(GetCommandHelp(c));
+    Command* c = GetCommand(Buffer);
+    if (c != NULL)
+        SetStatusBar(c->Help);
     else
         SetStatusBar("Type an expression now");
 

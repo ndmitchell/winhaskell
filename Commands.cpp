@@ -1,41 +1,39 @@
 #include "Header.h"
 #include "Commands.h"
 
-LPCTSTR CmdNames[] =
+Command Commands[] =
 {
-    "type", "load", "main", NULL
+    {true, "type", "Get a type"},
+    {true, "load", "Load a module"},
+    {true, "main", "Run the main command"},
+    {true, NULL, NULL}
 };
 
-LPCTSTR CmdHelp[] =
-{
-    "Get a type",
-    "Load a module",
-    "Run the main command",
-    "Type a command now",
-    "Unknown command",
-};
+Command CmdUnknown = {false, "unknown", "Unknown command"};
+Command CmdEmpty = {false, "blank", "Type a command now"};
 
 bool IsEmpty(TCHAR c)
 {
     return (c == 0 || isspace(c));
 }
 
-Commands GetCommand(LPCTSTR Cmd)
+Command* GetCommand(LPCTSTR Cmd)
 {
     LPCTSTR c = Cmd;
     while (isspace(*c))
         c++;
     if (*c != ':')
-        return CmdNone;
+        return NULL;
 
     int BestMatch = 0;
-    Commands BestCommand = CmdUnknown;
-    for (int i = 0; CmdNames[i] != NULL; i++)
+    Command* BestCommand = (IsEmpty(c[1]) ? &CmdEmpty : &CmdUnknown);
+
+    for (int i = 0; Commands[i].Name != NULL; i++)
     {
         int Match;
         for (Match = 0;
-            CmdNames[i][Match] != 0 &&
-            tolower(CmdNames[i][Match]) == tolower(c[Match+1]);
+            Commands[i].Name[Match] != 0 &&
+            tolower(Commands[i].Name[Match]) == tolower(c[Match+1]);
             Match++)
         {
             ; // Nothing
@@ -44,23 +42,14 @@ Commands GetCommand(LPCTSTR Cmd)
         if (IsEmpty(c[Match+1]) && (Match > BestMatch))
         {
             BestMatch = Match;
-            BestCommand = (Commands) i;
+            BestCommand = &Commands[i];
         }
     }
-
-    if (BestCommand == CmdUnknown && IsEmpty(c[1]))
-        return CmdEmpty;
-
     return BestCommand;
 }
 
 LPCTSTR GetArgument(LPCTSTR Cmd)
 {
     return NULL;
-}
-
-LPCTSTR GetCommandHelp(Commands Cmd)
-{
-    return CmdHelp[Cmd];
 }
 
