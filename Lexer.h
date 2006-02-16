@@ -4,7 +4,6 @@ enum Lexeme {
     LexOperator,
     LexOther,
     LexString,
-    LexSpace
 };
 
 Lexeme GetLexeme(LPCTSTR Buffer, int* Pos);

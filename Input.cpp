@@ -65,18 +65,15 @@ void InputChanged()
         Lexeme l = GetLexeme(Buffer, &Pos);
         SendMessage(hInput, EM_SETSEL, LastPos, Pos);
 
-        if (l != LexSpace)
-        {
-            if (l == LexKeyword)
-                cf.crTextColor = BLUE;
-            else if (l == LexOperator)
-                cf.crTextColor = RED;
-            else if (l == LexString)
-                cf.crTextColor = CYAN;
-            else
-                cf.crTextColor = BLACK;
-            SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
-        }
+        if (l == LexKeyword)
+            cf.crTextColor = BLUE;
+        else if (l == LexOperator)
+            cf.crTextColor = RED;
+        else if (l == LexString)
+            cf.crTextColor = CYAN;
+        else
+            cf.crTextColor = BLACK;
+        SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
     }
 
     //Now make all mismatched brackets bold

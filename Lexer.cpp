@@ -58,29 +58,35 @@ int CountString(LPCTSTR Buffer)
 Lexeme GetLexeme(LPCTSTR Buffer, int* Pos)
 {
     LPCTSTR c = &Buffer[*Pos];
-    LPCTSTR Orig = c;
-    *Pos = *Pos + 1;
+    Lexeme Res = LexOther;
 
-    if (IsSpace(*c))
-        return LexSpace;
+    while (IsSpace(*c))
+        c++;
+
+    if (*c == 0)
+        goto Return;
+
+    LPCTSTR Begin = c;
     if (IsSingleOp(*c))
-        return LexOperator;
+    {
+        c++;
+        Res = LexOperator;
+        goto Return;
+    }
 
     int Len = CountString(c);
     if (Len != 0)
     {
-        *Pos = *Pos + Len - 1;
+        *Pos = *Pos + Len;
         return LexString;
     }
 
-    Lexeme Res = GetType(*c);
-    while (true)
+    Res = GetType(*c);
+    do
     {
         c++;
-        if (*c == 0 || GetType(*c) != Res)
-            break;
-        *Pos = *Pos + 1;
     }
+    while (*c != 0 && GetType(*c) == Res);
 
     TCHAR b = *c;
     *((LPTSTR) c) = 0;
@@ -94,13 +100,16 @@ Lexeme GetLexeme(LPCTSTR Buffer, int* Pos)
     bool Valid = false;
     for (int i = 0; Items[i] != NULL; i++)
     {
-        if (strcmp(Items[i], Orig) == 0)
+        if (strcmp(Items[i], Begin) == 0)
             Valid = true;
     }
     if (!Valid)
         Res = LexOther;
 
     *((LPTSTR) c) = b;
+
+Return:
+    *Pos = (int) (c - Buffer);
     return Res;
 }
 
