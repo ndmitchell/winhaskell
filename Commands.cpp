@@ -3,9 +3,22 @@
 
 Command Commands[] =
 {
-    {true, "type", "Get a type"},
-    {true, "load", "Load a module"},
-    {true, "main", "Run the main command"},
+    {true, "load", ":load <filenames>, load modules from specified files"},
+    {true, "also", ":also <filenames>, read additional modules"},
+    {true, "reload", ":reload, repeat last load command"},
+    {true, "edit", ":edit, <filename>, edit file"},
+    {true, "module", ":module <module>, set module for evaluating expressions"},
+    {true, "type", ":type <expr>, print type of expression"},
+    {true, "?", ":?, display this list of commands"},
+    {true, "set", ":set <options>, set command line options"},
+    {true, "names", ":names [pat], list names currently in scope"},
+    {true, "info", ":info <names>, describe named objects"},
+    {true, "browse", ":browse <modules>, browse names exported by <modules>"},
+    {true, "main", ":main <aruments>, run the main function with the given arguments"},
+    {true, "find", ":find <name>, edit module containing definition of name"},
+    {true, "cd", ":cd dir, change directory"},
+    {true, "version", ":version, print Hugs version"},
+    {true, "quit", ":quit, exit Hugs interpreter"},
     {true, NULL, NULL}
 };
 
