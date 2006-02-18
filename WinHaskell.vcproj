@@ -118,6 +118,9 @@
 				RelativePath=".\Commands.cpp">
 			</File>
 			<File
+				RelativePath=".\Completion.cpp">
+			</File>
+			<File
 				RelativePath=".\History.cpp">
 			</File>
 			<File
@@ -154,6 +157,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\Commands.h">
+			</File>
+			<File
+				RelativePath=".\Completion.h">
 			</File>
 			<File
 				RelativePath=".\Header.h">
@@ -229,5 +235,8 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="Resources.rc"/>
 	</Globals>
 </VisualStudioProject>

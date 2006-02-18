@@ -1,4 +1,6 @@
 
+class Completion;
+
 struct Command
 {
     bool Real;
@@ -8,3 +10,4 @@ struct Command
 
 Command* GetCommand(LPCTSTR Cmd);
 LPCTSTR GetArgument(LPCTSTR Cmd);
+void CommandsCompletion(Completion* c);

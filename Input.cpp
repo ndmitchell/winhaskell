@@ -3,9 +3,12 @@
 #include "History.h"
 #include "Lexer.h"
 #include "Commands.h"
+#include "Completion.h"
 
 TCHAR* Buffer = NULL;
 HWND hInput;
+
+Completion* CmdComplete = NULL;
 
 void InputInit(HWND hInput)
 {
@@ -96,11 +99,31 @@ void InputChanged()
     }
 
     //Now give command help if appropriate
+    bool ShowComplete = false;
     Command* c = GetCommand(Buffer);
     if (c != NULL)
+    {
         SetStatusBar(c->Help);
+
+        Pos = 0;
+        if (GetLexeme(Buffer, &Pos) == LexCommand &&
+            Buffer[Pos] == 0 && false)
+        {
+            ShowComplete = true;
+
+            if (CmdComplete == NULL)
+            {
+                CmdComplete = new Completion(NULL);
+                CommandsCompletion(CmdComplete);
+            }
+            CmdComplete->Show();
+        }
+    }
     else
         SetStatusBar("Type an expression now");
+
+    if (CmdComplete != NULL && !ShowComplete)
+        CmdComplete->Hide();
 
     delete[] Buffer;
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);

@@ -1,5 +1,6 @@
 #include "Header.h"
 #include "Commands.h"
+#include "Completion.h"
 
 Command Commands[] =
 {
@@ -66,3 +67,8 @@ LPCTSTR GetArgument(LPCTSTR Cmd)
     return NULL;
 }
 
+void CommandsCompletion(Completion* c)
+{
+    for (int i = 0; Commands[i].Name != NULL; i++)
+        c->Add(Commands[i].Name);
+}

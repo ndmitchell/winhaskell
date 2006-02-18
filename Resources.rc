@@ -106,6 +106,15 @@ BEGIN
                     266,88,WS_EX_CLIENTEDGE
 END
 
+DLG_COMPLETION DIALOGEX 0, 0, 106, 67
+STYLE DS_SETFONT | WS_POPUP | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+FONT 10, "Courier New", 400, 0, 0x0
+BEGIN
+    LISTBOX         LST_COMPLETION,0,0,106,67,LBS_SORT | NOT WS_BORDER | 
+                    WS_VSCROLL | WS_TABSTOP,WS_EX_DLGMODALFRAME
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
