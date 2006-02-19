@@ -49,6 +49,23 @@ void Completion::SetCurrent(LPCTSTR Str)
     }
 }
 
+void Completion::SetCurrentDelta(int Delta)
+{
+    int Index = (int) SendMessage(hLst, LB_GETCURSEL, 0, 0);
+    if (Index == -1) return;
+    int Max = (int) SendMessage(hLst, LB_GETCOUNT, 0, 0);
+
+    Index += Delta;
+    if (Index >= Max || Index < 0) return;
+    SendMessage(hLst, LB_SETCURSEL, Index, 0);
+}
+
+void Completion::GetCurrent(LPTSTR Buffer)
+{
+    int Index = (int) SendMessage(hLst, LB_GETCURSEL, 0, 0);
+    SendMessage(hLst, LB_GETTEXT, Index, (LPARAM) Buffer);
+}
+
 void Completion::Move(POINT pt)
 {
     RECT rc;

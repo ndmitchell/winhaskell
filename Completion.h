@@ -17,6 +17,7 @@ public:
     void Show();
     void Hide();
 
-    LPCTSTR GetCurrent(){return NULL;};
+    void GetCurrent(LPTSTR Buffer);
     void SetCurrent(LPCTSTR Str);
+    void SetCurrentDelta(int Delta);
 };

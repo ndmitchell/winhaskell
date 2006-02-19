@@ -14,6 +14,7 @@ Completion* CompFile = NULL;
 Completion* CompCode = NULL;
 
 Completion* Active = NULL;
+LexItem CompItem;
 
 void InputInit(HWND hInput)
 {
@@ -129,15 +130,32 @@ void InputChanged()
 
             Buffer[Items[0].End] = 0;
             CompCommand->SetCurrent(&Buffer[Items[0].Start]);
+            Active = CompCommand;
+            CompItem = Items[0];
         }
     }
     else
         SetStatusBar("Type an expression now");
 
     if (CompCommand != NULL && !ShowComplete)
+    {
         CompCommand->Hide();
+        Active = NULL;
+    }
 
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);
+}
+
+void CompletionFinish()
+{
+    TCHAR Buffer[100];
+    Active->GetCurrent(Buffer);
+
+    SendMessage(hInput, EM_SETSEL, CompItem.Start, CompItem.End);
+    SendMessage(hInput, EM_REPLACESEL, FALSE, (LPARAM) Buffer);
+
+    Active->Hide();
+    Active = NULL;
 }
 
 BOOL InputNotify(NMHDR* nmhdr)
@@ -151,13 +169,24 @@ BOOL InputNotify(NMHDR* nmhdr)
 			if (mf->wParam == VK_RETURN)
 			{
 				Cancel = true;
-				MainDialogFireCommand();
+                if (Active == NULL)
+				    MainDialogFireCommand();
+                else
+                    CompletionFinish();
 			}
+            else if (mf->wParam == VK_TAB && Active != NULL)
+            {
+                Cancel = true;
+                CompletionFinish();
+            }
 			else if (mf->wParam == VK_UP || mf->wParam == VK_DOWN)
 			{
 				Cancel = true;
-				SetWindowText(hInput,
-					HistoryGet(mf->wParam == VK_UP ? -1 : +1));
+                int Dir = (mf->wParam == VK_UP ? -1 : +1);
+                if (Active == NULL)
+				    SetWindowText(hInput, HistoryGet(Dir));
+                else
+                    Active->SetCurrentDelta(Dir);
 			}
 
 			if (Cancel)
