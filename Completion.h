@@ -12,7 +12,7 @@ public:
     ~Completion();
 
     void Add(LPCTSTR Str);
-    void Move(POINT Pos){};
+    void Move(POINT pt);
 
     void Show();
     void Hide();

@@ -1,8 +1,6 @@
 #include "Header.h"
 #include "Completion.h"
 
-HWND hComplete;
-
 INT_PTR CALLBACK CompletionProc(HWND hwndDlg,
     UINT uMsg,
     WPARAM wParam,
@@ -23,7 +21,7 @@ Completion::Completion(CompletionCallback Callback)
 
 Completion::~Completion()
 {
-    DestroyWindow(hComplete);
+    DestroyWindow(hWnd);
 }
 
 void Completion::Hide()
@@ -45,6 +43,17 @@ void Completion::SetCurrent(LPCTSTR Str)
 {
     int Index = (int) SendMessage(hLst, LB_FINDSTRING, -1, (LPARAM) Str);
     if (Index != LB_ERR)
+    {
+        SendMessage(hLst, LB_SETTOPINDEX, Index - 3, 0);
         SendMessage(hLst, LB_SETCURSEL, Index, 0);
+    }
+}
+
+void Completion::Move(POINT pt)
+{
+    RECT rc;
+    GetWindowRect(hWnd, &rc);
+    SetWindowPos(hWnd, NULL, pt.x, pt.y + rc.top - rc.bottom, 0, 0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
