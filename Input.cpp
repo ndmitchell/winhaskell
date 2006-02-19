@@ -107,7 +107,7 @@ void InputChanged()
 
         Pos = 0;
         if (GetLexeme(Buffer, &Pos) == LexCommand &&
-            Buffer[Pos] == 0 && false)
+            Buffer[Pos] == 0)
         {
             ShowComplete = true;
 
@@ -116,7 +116,14 @@ void InputChanged()
                 CmdComplete = new Completion(NULL);
                 CommandsCompletion(CmdComplete);
             }
+
+            RECT rc;
+            GetWindowRect(hInput, &rc);
+            POINT pt = {rc.left, rc.top};
+
+            CmdComplete->Move(pt);
             CmdComplete->Show();
+            CmdComplete->SetCurrent(Buffer);
         }
     }
     else
