@@ -41,3 +41,10 @@ void Completion::Add(LPCTSTR Str)
     SendMessage(hLst, LB_ADDSTRING, 0, (LPARAM) Str);
 }
 
+void Completion::SetCurrent(LPCTSTR Str)
+{
+    int Index = (int) SendMessage(hLst, LB_FINDSTRING, -1, (LPARAM) Str);
+    if (Index != LB_ERR)
+        SendMessage(hLst, LB_SETCURSEL, Index, 0);
+}
+

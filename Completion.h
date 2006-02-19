@@ -18,5 +18,5 @@ public:
     void Hide();
 
     LPCTSTR GetCurrent(){return NULL;};
-    void SetCurrent(LPCTSTR Str){};
+    void SetCurrent(LPCTSTR Str);
 };
