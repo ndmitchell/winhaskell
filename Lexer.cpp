@@ -143,6 +143,11 @@ int GetLexemes(LPCTSTR Buffer, LexItem* Items, int ItemsSize)
         Items[i].Start = Pos;
         Items[i].Lex = GetLexeme(Buffer, &Pos);
         Items[i].End = Pos;
+
+        while (IsSpace(Buffer[Items[i].Start]))
+            Items[i].Start++;
+        if (Buffer[Items[i].Start] == 0)
+            return i; // do not include this one
     }
 }
 

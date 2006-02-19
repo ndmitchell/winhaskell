@@ -102,8 +102,8 @@ void InputChanged()
         SetStatusBar(c->Help);
 
         int Pos = 0;
-        if (GetLexeme(Buffer, &Pos) == LexCommand &&
-            Buffer[Pos] == 0)
+        if (LexItems > 0 && Items[0].Lex == LexCommand &&
+            cr.cpMin >= Items[0].Start && cr.cpMax <= Items[0].End)
         {
             ShowComplete = true;
 
@@ -119,7 +119,9 @@ void InputChanged()
 
             CompCommand->Move(pt);
             CompCommand->Show();
-            CompCommand->SetCurrent(Buffer);
+
+            Buffer[Items[0].End] = 0;
+            CompCommand->SetCurrent(&Buffer[Items[0].Start]);
         }
     }
     else
