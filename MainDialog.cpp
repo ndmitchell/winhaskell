@@ -8,6 +8,8 @@
 #include "Registry.h"
 #include "Lexer.h"
 
+Wrapper* Wrap;
+
 const int ToolbarHeight = 46;
 
 bool MultilineText = false;
@@ -142,7 +144,7 @@ void MainDialogInit()
 
 	InputInit(GetDlgItem(G_hWnd, rtfInput));
 
-	InitWrapper();
+	Wrap = WrapperInit();
 }
 
 void FireCommand()
@@ -168,7 +170,7 @@ void FireCommand()
             RecentFilesAdd(Argument);
 	}
 
-	RunCommand(Command);
+	Wrap->RunCommand(Command);
 }
 
 
@@ -205,7 +207,7 @@ void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case ID_STOP:
-		AbortExecution();
+		Wrap->AbortExecution();
 		break;
 
     case rtfInput:

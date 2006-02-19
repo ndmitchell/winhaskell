@@ -1,8 +1,14 @@
 
-extern bool Running;
+class Wrapper
+{
+public:
+    bool Executing;
 
-bool InitWrapper();
-void TermWrapper();
+    Wrapper(){};
+    virtual ~Wrapper(){};
 
-void RunCommand(LPCTSTR Command);
-void AbortExecution();
+    virtual void RunCommand(LPCTSTR Command) = 0;
+    virtual void AbortExecution() = 0;
+};
+
+Wrapper* WrapperInit();

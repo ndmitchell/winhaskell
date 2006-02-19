@@ -148,6 +148,9 @@
 				RelativePath=".\Toolbar.cpp">
 			</File>
 			<File
+				RelativePath=".\WrapHugs.cpp">
+			</File>
+			<File
 				RelativePath=".\Wrapper.cpp">
 			</File>
 		</Filter>
@@ -189,6 +192,9 @@
 				RelativePath=".\Toolbar.h">
 			</File>
 			<File
+				RelativePath=".\WrapHugs.h">
+			</File>
+			<File
 				RelativePath=".\Wrapper.h">
 			</File>
 		</Filter>
@@ -221,10 +227,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">
