@@ -69,6 +69,12 @@ LPCTSTR GetArgument(LPCTSTR Cmd)
 
 void CommandsCompletion(Completion* c)
 {
+    TCHAR Buffer[100];
+    Buffer[0] = ':';
+
     for (int i = 0; Commands[i].Name != NULL; i++)
-        c->Add(Commands[i].Name);
+    {
+        strcpy(&Buffer[1], Commands[i].Name);
+        c->Add(Buffer);
+    }
 }
