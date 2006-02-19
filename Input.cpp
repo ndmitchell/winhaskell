@@ -6,6 +6,7 @@
 #include "Completion.h"
 
 HWND hInput;
+int CharWidth;
 
 // The active completion objects
 Completion* CompCommand = NULL;
@@ -31,6 +32,12 @@ void InputInit(HWND hInput)
 
     // Give lots of space for buffer manips
     SendMessage(hInput, EM_LIMITTEXT, MaxInputSize - 50, 0);
+
+    HDC hDC = GetDC(hInput);
+    SIZE sz;
+    BOOL b = GetTextExtentPoint(hDC, "WINHASKELL", 10, &sz);
+    CharWidth = (b ? sz.cx / 10 : 10);
+    ReleaseDC(hInput, hDC);
 }
 
 void InputGet(LPTSTR Buffer)
@@ -115,7 +122,7 @@ void InputChanged()
 
             RECT rc;
             GetWindowRect(hInput, &rc);
-            POINT pt = {rc.left, rc.top};
+            POINT pt = {rc.left + (CharWidth * Items[0].Start), rc.top};
 
             CompCommand->Move(pt);
             CompCommand->Show();
