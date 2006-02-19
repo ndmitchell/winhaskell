@@ -24,6 +24,9 @@ void InputInit(HWND hInput)
 	strcpy(cf.szFaceName, "Courier New");
 	cf.yHeight = 200;
     SendMessage(hInput, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
+
+    // Give lots of space for buffer manips
+    SendMessage(hRTF, EM_LIMITTEXT, MaxInputSize - 50, 0);
 }
 
 //Do not make anyone responsible for deleting the input buffer
