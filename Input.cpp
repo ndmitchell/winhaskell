@@ -126,7 +126,7 @@ void InputChanged()
             POINT pt = {rc.left + (CharWidth * Items[0].Start), rc.top};
 
             CompCommand->Move(pt);
-            CompCommand->Show();
+            //CompCommand->Show();
 
             Buffer[Items[0].End] = 0;
             CompCommand->SetCurrent(&Buffer[Items[0].Start]);
@@ -160,12 +160,13 @@ void CompletionFinish()
 
 BOOL InputNotify(NMHDR* nmhdr)
 {
+	bool Cancel = false;
+
 	if (nmhdr->code == EN_MSGFILTER)
 	{
 		MSGFILTER* mf = (MSGFILTER*) nmhdr;
 		if (mf->msg == WM_KEYDOWN)
 		{
-			bool Cancel = false;
 			if (mf->wParam == VK_RETURN)
 			{
 				Cancel = true;
@@ -174,11 +175,6 @@ BOOL InputNotify(NMHDR* nmhdr)
                 else
                     CompletionFinish();
 			}
-            else if (mf->wParam == VK_TAB && Active != NULL)
-            {
-                Cancel = true;
-                CompletionFinish();
-            }
 			else if (mf->wParam == VK_UP || mf->wParam == VK_DOWN)
 			{
 				Cancel = true;
@@ -188,13 +184,21 @@ BOOL InputNotify(NMHDR* nmhdr)
                 else
                     Active->SetCurrentDelta(Dir);
 			}
-
-			if (Cancel)
-			{
-				SetWindowLong(G_hWnd, DWL_MSGRESULT, 1);
-				return TRUE;
-			}
 		}
+        else if (mf->msg == WM_CHAR && mf->wParam == VK_TAB)
+        {
+            if (mf->wParam == VK_TAB && Active != NULL)
+            {
+                Cancel = true;
+                CompletionFinish();
+            }
+        }
+	}
+
+	if (Cancel)
+	{
+		SetWindowLong(G_hWnd, DWL_MSGRESULT, 1);
+		return TRUE;
 	}
 	return FALSE;
 }
