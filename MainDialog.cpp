@@ -149,12 +149,8 @@ void MainDialogInit()
 
 void FireCommand()
 {
-    LPCTSTR Command = InputGet();
-
-	int Len = (int) strlen(Command);
-	LPTSTR Buffer = new TCHAR[Len+2];
-	strcpy(Buffer, Command);
-	strcat(Buffer, "\n");
+    TCHAR Command[MaxInputSize];
+    InputGet(Command);
 
 	OutputCopy(GetDlgItem(G_hWnd, rtfInput));
     OutputAppend("\n");
@@ -176,8 +172,9 @@ void FireCommand()
 
 void MainDialogFireCommand()
 {
-	LPCTSTR Buffer = InputGet();
-	if (Buffer == NULL)
+    TCHAR Buffer[MaxInputSize];
+	InputGet(Buffer);
+	if (Buffer[0] == 0)
         InputSet(":main");
 
 	FireCommand();

@@ -5,7 +5,6 @@
 #include "Commands.h"
 #include "Completion.h"
 
-TCHAR* Buffer = NULL;
 HWND hInput;
 
 Completion* CmdComplete = NULL;
@@ -26,23 +25,12 @@ void InputInit(HWND hInput)
     SendMessage(hInput, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
 
     // Give lots of space for buffer manips
-    SendMessage(hRTF, EM_LIMITTEXT, MaxInputSize - 50, 0);
+    SendMessage(hInput, EM_LIMITTEXT, MaxInputSize - 50, 0);
 }
 
-//Do not make anyone responsible for deleting the input buffer
-//Return NULL if empty
-LPCTSTR InputGet()
+void InputGet(LPTSTR Buffer)
 {
-	if (Buffer != NULL)
-		delete[] Buffer;
-
-	int Size = GetWindowTextLength(hInput);
-	Buffer = new TCHAR[Size+3];
-	if (Size == 0)
-		return NULL;
-	else
-		GetWindowText(hInput, Buffer, Size+1);
-	return Buffer;
+	GetWindowText(hInput, Buffer, MaxInputSize);
 }
 
 void InputSet(LPCTSTR Buffer)

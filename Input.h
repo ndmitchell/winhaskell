@@ -1,6 +1,6 @@
 
 void InputInit(HWND hInput);
-LPCTSTR InputGet();
+void InputGet(LPTSTR Buffer);
 void InputSet(LPCTSTR Buffer);
 BOOL InputNotify(NMHDR* nmhdr);
 void InputChanged();
