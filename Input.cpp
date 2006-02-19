@@ -7,7 +7,12 @@
 
 HWND hInput;
 
-Completion* CmdComplete = NULL;
+// The active completion objects
+Completion* CompCommand = NULL;
+Completion* CompFile = NULL;
+Completion* CompCode = NULL;
+
+Completion* Active = NULL;
 
 void InputInit(HWND hInput)
 {
@@ -43,9 +48,12 @@ void InputChanged()
     CHARRANGE cr;
     SendMessage(hInput, EM_EXGETSEL, 0, (LPARAM) &cr);
 
+    TCHAR Buffer[MaxInputSize];
+    GetWindowText(hInput, Buffer, MaxInputSize);
     int Length = GetWindowTextLength(hInput);
-    TCHAR* Buffer = new TCHAR[Length+2];
-    GetWindowText(hInput, Buffer, Length+1);
+
+    LexItem Items[250];
+    int LexItems = GetLexemes(Buffer, Items, 250);
 
     CHARFORMAT cf;
     cf.cbSize = sizeof(cf);
@@ -53,24 +61,21 @@ void InputChanged()
     cf.dwEffects = 0;
 
     //First do syntax colouring
-    int Pos = 0;
-    while (Buffer[Pos] != 0)
+    for (int i = 0; i < LexItems; i++)
     {
-        int LastPos = Pos;
-        Lexeme l = GetLexeme(Buffer, &Pos);
-        SendMessage(hInput, EM_SETSEL, LastPos, Pos);
+        SendMessage(hInput, EM_SETSEL, Items[i].Start, Items[i].End);
 
         cf.dwEffects = 0;
-        if (l == LexKeyword)
+        if (Items[i].Lex == LexKeyword)
             cf.crTextColor = BLUE;
-        else if (l == LexOperator)
+        else if (Items[i].Lex == LexOperator)
             cf.crTextColor = RED;
-        else if (l == LexString)
+        else if (Items[i].Lex == LexString)
             cf.crTextColor = CYAN;
         else
         {
             cf.crTextColor = BLACK;
-            if (l == LexCommand)
+            if (Items[i].Lex == LexCommand)
                 cf.dwEffects = CFE_BOLD;
         }
         SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
@@ -96,34 +101,33 @@ void InputChanged()
     {
         SetStatusBar(c->Help);
 
-        Pos = 0;
+        int Pos = 0;
         if (GetLexeme(Buffer, &Pos) == LexCommand &&
             Buffer[Pos] == 0)
         {
             ShowComplete = true;
 
-            if (CmdComplete == NULL)
+            if (CompCommand == NULL)
             {
-                CmdComplete = new Completion(NULL);
-                CommandsCompletion(CmdComplete);
+                CompCommand = new Completion(NULL);
+                CommandsCompletion(CompCommand);
             }
 
             RECT rc;
             GetWindowRect(hInput, &rc);
             POINT pt = {rc.left, rc.top};
 
-            CmdComplete->Move(pt);
-            CmdComplete->Show();
-            CmdComplete->SetCurrent(Buffer);
+            CompCommand->Move(pt);
+            CompCommand->Show();
+            CompCommand->SetCurrent(Buffer);
         }
     }
     else
         SetStatusBar("Type an expression now");
 
-    if (CmdComplete != NULL && !ShowComplete)
-        CmdComplete->Hide();
+    if (CompCommand != NULL && !ShowComplete)
+        CompCommand->Hide();
 
-    delete[] Buffer;
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);
 }
 

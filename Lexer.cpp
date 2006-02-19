@@ -123,6 +123,30 @@ Return:
     return Res;
 }
 
+int GetLexemes(LPCTSTR Buffer, LexItem* Items, int ItemsSize)
+{
+    int Pos = 0;
+    for (int i = 0; ; i++)
+    {
+        if (Buffer[Pos] == 0)
+        {
+            return i;
+        }
+        if (i + 1 == ItemsSize)
+        {
+            Items[i].Start = Pos;
+            Items[i].End = (int) strlen(Buffer);
+            Items[i].Lex = LexOther;
+            return ItemsSize;
+        }
+
+        Items[i].Start = Pos;
+        Items[i].Lex = GetLexeme(Buffer, &Pos);
+        Items[i].End = Pos;
+    }
+}
+
+
 LPCTSTR OpenBracket = "([{";
 LPCTSTR ShutBracket = ")]}";
 
