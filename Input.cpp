@@ -8,6 +8,8 @@
 HWND hInput;
 int CharWidth;
 
+const bool ShowAutoComplete = true;
+
 // The active completion objects
 Completion* CompCommand = NULL;
 Completion* CompFile = NULL;
@@ -126,7 +128,8 @@ void InputChanged()
             POINT pt = {rc.left + (CharWidth * Items[0].Start), rc.top};
 
             CompCommand->Move(pt);
-            //CompCommand->Show();
+            if (ShowAutoComplete)
+                CompCommand->Show();
 
             Buffer[Items[0].End] = 0;
             CompCommand->SetCurrent(&Buffer[Items[0].Start]);
