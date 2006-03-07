@@ -195,6 +195,32 @@ void FlipExpand()
 
 }
 
+void MainDialogPickOpenFile()
+{
+	TCHAR Buffer[MAX_PATH];
+	Buffer[0] = 0;
+
+	OPENFILENAME ofn = {0};
+    ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hInstance = G_hInstance;
+    ofn.hwndOwner = G_hWnd;
+    ofn.lpstrFilter = "Haskell Files (*.hs;*.lhs)\0*.hs;*.lhs\0All Files (*.*)\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFile= Buffer;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.lpstrFileTitle = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER;
+    ofn.lpfnHook = NULL;
+    ofn.lpstrInitialDir = NULL;
+    if (!GetOpenFileName(&ofn))
+		return;
+
+	TCHAR Buffer2[MAX_PATH+100];
+	wsprintf(Buffer2, ":load \"%s\"", Buffer);
+	InputSet(Buffer2);
+	FireCommand();
+}
+
 void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 {
 	switch (ID)
@@ -205,6 +231,10 @@ void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 
 	case ID_STOP:
 		Wrap->AbortExecution();
+		break;
+
+	case ID_OPEN:
+		MainDialogPickOpenFile();
 		break;
 
     case rtfInput:
