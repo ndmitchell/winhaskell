@@ -151,8 +151,43 @@
 				RelativePath=".\WrapHugs.cpp">
 			</File>
 			<File
+				RelativePath=".\WrapInteract.cpp">
+			</File>
+			<File
 				RelativePath=".\Wrapper.cpp">
 			</File>
+			<Filter
+				Name="Evaluators"
+				Filter="">
+				<File
+					RelativePath=".\GHCi.cpp">
+				</File>
+				<File
+					RelativePath=".\GHCi.h">
+				</File>
+				<File
+					RelativePath=".\Hugs.cpp">
+				</File>
+				<File
+					RelativePath=".\Hugs.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Console"
+				Filter="">
+				<File
+					RelativePath=".\Console.cpp">
+				</File>
+				<File
+					RelativePath=".\Console.h">
+				</File>
+				<File
+					RelativePath=".\Interpreter.cpp">
+				</File>
+				<File
+					RelativePath=".\Interpreter.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -193,6 +228,9 @@
 			</File>
 			<File
 				RelativePath=".\WrapHugs.h">
+			</File>
+			<File
+				RelativePath=".\WrapInteract.h">
 			</File>
 			<File
 				RelativePath=".\Wrapper.h">

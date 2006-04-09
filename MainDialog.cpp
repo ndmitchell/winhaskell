@@ -8,6 +8,10 @@
 #include "Registry.h"
 #include "Lexer.h"
 
+#include "Console.h"
+#include "Interpreter.h"
+#include "Hugs.h"
+
 Wrapper* Wrap;
 
 const int ToolbarHeight = 46;
@@ -144,7 +148,8 @@ void MainDialogInit()
 
 	InputInit(GetDlgItem(G_hWnd, rtfInput));
 
-	Wrap = WrapperInit();
+	//Wrap = WrapperInit();
+    StartHugs();
 }
 
 void FireCommand()

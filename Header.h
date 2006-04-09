@@ -5,6 +5,8 @@
 #include <tchar.h>
 #include "resource.h"
 
+#include <assert.h>
+
 
 #define BLACK	RGB(0,0,0)
 #define BLUE	RGB(0,0,175)
