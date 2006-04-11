@@ -115,6 +115,13 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP,WS_EX_DLGMODALFRAME
 END
 
+CTL_TOOLBAR DIALOGEX 0, 0, 306, 53
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",TAB_LIST,"SysTabControl32",0x0,0,2,226,49
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -154,6 +161,22 @@ END
 1                       ICON                    "resource\\winhaskell.ico"
 ICO_DOWN                ICON                    "resource\\down.ico"
 ICO_UP                  ICON                    "resource\\up.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    CTL_TOOLBAR, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 49
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 #endif    // English (U.K.) resources
 /////////////////////////////////////////////////////////////////////////////
 

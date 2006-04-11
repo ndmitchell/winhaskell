@@ -1,73 +1,46 @@
 #include "Header.h"
-#include "Wrapper.h"
+#include "Application.h"
+#include "Toolbar.h"
+
 #include "Output.h"
 #include "Input.h"
-#include "History.h"
-#include "Toolbar.h"
-#include "RecentFiles.h"
-#include "Registry.h"
-#include "Lexer.h"
-
 #include "Console.h"
 #include "Interpreter.h"
 #include "Hugs.h"
+#include "History.h"
+#include "Lexer.h"
+#include "RecentFiles.h"
 
-Wrapper* Wrap;
+Application* app;
 
-const int ToolbarHeight = 80;
-HWND DialogToolbar;
-
-bool MultilineText = false;
+void ShowMainDialog();
 
 
-void SetStatusBar(LPCTSTR Text)
+Application::Application()
 {
-	SetDlgItemText(G_hWnd, ID_STATUS, Text);
+    app = this;
+    ShowMainDialog();
 }
 
-void ExecuteStage(es Stage)
+void Application::FireCommand(Command c, int Param)
 {
-	if (Stage != esCompiling)
-	{
-		bool Enter = (Stage == esRunning);
-
-		TBBUTTONINFO tbi;
-		tbi.cbSize = sizeof(tbi);
-		tbi.dwMask = TBIF_STATE;
-
-		tbi.fsState = (Enter ? TBSTATE_ENABLED : 0);
-		SendDlgItemMessage(G_hWnd, ID_TOOLBAR, TB_SETBUTTONINFO, ID_STOP, (LPARAM) &tbi);
-
-		tbi.fsState = (Enter ? 0 : TBSTATE_ENABLED);
-		SendDlgItemMessage(G_hWnd, ID_TOOLBAR, TB_SETBUTTONINFO, ID_RUN, (LPARAM) &tbi);
-	}
-	switch (Stage)
-	{
-	case esCompiling:
-		SetStatusBar("Compiling...");
-		break;
-
-	case esRunning:
-		SetStatusBar("Running...");
-		break;
-
-	case esFinished:
-		SetStatusBar("Finished");
-		break;
-	}
 }
 
-HANDLE hProc = NULL;
-
-void ActiveProcess(HANDLE hProcess)
+HMENU Application::QueryCommand(Command c)
 {
-	hProc = hProcess;
+    return GetSystemMenu(app->hWnd, FALSE);
 }
 
 void ExecutionComplete()
 {
-	ExecuteStage(esFinished);
 }
+
+
+void SetStatusBar(LPCTSTR Text)
+{
+    SetDlgItemText(app->hWnd, ID_STATUS, Text);
+}
+
 
 void MainDialogResize()
 {
@@ -75,13 +48,16 @@ void MainDialogResize()
 	int Height;
 	RECT rcWnd, rc;
 
+    HWND G_hWnd = app->hWnd;
+
 	HWND hRtfInput = GetDlgItem(G_hWnd, rtfInput);
 	HWND hRtfOutput = GetDlgItem(G_hWnd, rtfOutput);
 
 	GetClientRect(G_hWnd, &rcWnd);
 	Height = rcWnd.bottom;
 
-    MoveWindow(DialogToolbar, 0, 0, rcWnd.right, ToolbarHeight, TRUE);
+    int ToolbarHeight = app->toolbar->Height();
+    MoveWindow(app->toolbar->hWnd, 0, 0, rcWnd.right, ToolbarHeight, TRUE);
 
 	hItem = GetDlgItem(G_hWnd, ID_STATUS);
 	GetClientRect(hItem, &rc);
@@ -89,7 +65,7 @@ void MainDialogResize()
 		rcWnd.right, rc.bottom, TRUE);
 	Height -= rc.bottom + 3;
 
-	int txtHeight = (MultilineText ? 100 : 24);
+	int txtHeight = (false ? 100 : 24);
 	MoveWindow(hRtfInput, 0, Height - txtHeight,
 		rcWnd.right - 28, txtHeight, TRUE);
 	MoveWindow(GetDlgItem(G_hWnd, ID_EXPAND), rcWnd.right - 25,
@@ -100,6 +76,7 @@ void MainDialogResize()
 		rcWnd.right, Height - ToolbarHeight, TRUE);
 }
 
+/*
 void MainDialogInitArrows()
 {
     // create the image list
@@ -128,21 +105,21 @@ void MainDialogInitArrows()
     SendMessage(hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(16,16));
     SendMessage(hToolbar, TB_ADDBUTTONS, 1, (LPARAM) &tb);
 }
-
+*/
 
 void MainDialogInit()
 {
-    RegistryReadWindowPos(G_hWnd);
+    HWND G_hWnd = app->hWnd;
+//    RegistryReadWindowPos(G_hWnd);
 
-	DialogToolbar = ToolbarInit();
-	RecentFilesInit();
-	MainDialogInitArrows();
-    CreateStatusWindow(WS_CHILD | WS_VISIBLE, "Welcome to WinHaskell", G_hWnd, ID_STATUS);
+    app->toolbar = new Toolbar(app->hWnd);
+
+    //RecentFilesInit();
+	//MainDialogInitArrows();
+    //CreateStatusWindow(WS_CHILD | WS_VISIBLE, "Welcome to WinHaskell", G_hWnd, ID_STATUS);
 	MainDialogResize();
 
-	SendMessage(G_hWnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIcon(G_hInstance, MAKEINTRESOURCE(1)));
-
-	ExecuteStage(esFinished);
+	SendMessage(G_hWnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIcon(hInst, MAKEINTRESOURCE(1)));
 
 	OutputInit(GetDlgItem(G_hWnd, rtfOutput));
 	OutputColor(GREEN);
@@ -160,10 +137,12 @@ void FireCommand()
     TCHAR Command[MaxInputSize];
     InputGet(Command);
 
+    HWND G_hWnd = app->hWnd;
+
 	OutputCopy(GetDlgItem(G_hWnd, rtfInput));
     OutputAppend("\n");
 
-	ExecuteStage(esRunning);
+	//ExecuteStage(esRunning);
 
 	HistoryAdd(Command);
 
@@ -174,7 +153,7 @@ void FireCommand()
             RecentFilesAdd(Argument);
 	}
 
-	Wrap->RunCommand(Command);
+	//Wrap->RunCommand(Command);
 }
 
 
@@ -190,6 +169,7 @@ void MainDialogFireCommand()
 
 void FlipExpand()
 {
+    /*
 	MultilineText = !MultilineText;
 	ShowWindow(GetDlgItem(G_hWnd, ID_ENTER), (MultilineText ? SW_SHOW : SW_HIDE));
 
@@ -200,11 +180,12 @@ void FlipExpand()
 	SendDlgItemMessage(G_hWnd, ID_EXPAND, TB_SETBUTTONINFO, ID_EXPAND, (LPARAM) &tbi);
 
 	MainDialogResize();
-
+    */
 }
 
 void MainDialogPickOpenFile()
 {
+    /*
 	TCHAR Buffer[MAX_PATH];
 	Buffer[0] = 0;
 
@@ -227,10 +208,12 @@ void MainDialogPickOpenFile()
 	wsprintf(Buffer2, ":load \"%s\"", Buffer);
 	InputSet(Buffer2);
 	FireCommand();
+    */
 }
 
 void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 {
+    /*
 	switch (ID)
 	{
 	case ID_RUN:
@@ -260,16 +243,19 @@ void MainDialogCommand(int ID, WPARAM wParam, LPARAM lParam)
 	case IDCANCEL:
 		EndDialog(G_hWnd, 0);
 		break;
-	}
+	}*/
 }
 
 BOOL MainDialogNotify(LPNMHDR nmhdr)
 {
+    /*
 	if (nmhdr->idFrom == rtfInput)
 		return InputNotify(nmhdr);
 	else if (nmhdr->idFrom == ID_TOOLBAR || nmhdr->code == TTN_GETDISPINFO)
 		return ToolbarNotify(NULL, nmhdr);
 	return FALSE;
+    */
+    return FALSE;
 }
 
 void MainDialogDropFiles(HDROP hDrop)
@@ -294,7 +280,7 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
-		G_hWnd = hWnd;
+        app->hWnd = hWnd;
 	    MainDialogInit();
 	    break;
 
@@ -319,7 +305,7 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	    break;
 
 	case WM_CLOSE:
-        RegistryWriteWindowPos(hWnd);
+        //RegistryWriteWindowPos(hWnd);
 		PostQuitMessage(0);
 		break;
 	}
@@ -329,5 +315,5 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 void ShowMainDialog()
 {
-    CreateDialog(G_hInstance, MAKEINTRESOURCE(DLG_MAIN), NULL, &MainDialogProc);
+    CreateDialog(hInst, MAKEINTRESOURCE(DLG_MAIN), NULL, &MainDialogProc);
 }

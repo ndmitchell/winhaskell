@@ -1,5 +1,6 @@
 #include "Header.h"
 #include "Completion.h"
+#include "Application.h"
 
 INT_PTR CALLBACK CompletionProc(HWND hwndDlg,
     UINT uMsg,
@@ -13,9 +14,9 @@ INT_PTR CALLBACK CompletionProc(HWND hwndDlg,
 Completion::Completion(CompletionCallback Callback)
 {
     this->Callback = Callback;
-    hWnd = CreateDialog(G_hInstance,
+    hWnd = CreateDialog(hInst,
         MAKEINTRESOURCE(DLG_COMPLETION),
-        G_hWnd, CompletionProc);
+        app->hWnd, CompletionProc);
     hLst = GetDlgItem(hWnd, LST_COMPLETION);
 }
 

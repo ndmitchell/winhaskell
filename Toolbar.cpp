@@ -1,118 +1,201 @@
 #include "Header.h"
-#include "RecentFiles.h"
+#include "Application.h"
+#include "Toolbar.h"
 
-HWND hToolbar;
+#include "Icon.h"
+#include "Command.h"
 
-int Buttons[] = {
-    // -1 is a separator, 0 is the end
-    ID_OPEN, -1,
-	ID_RUN, ID_STOP, -1,
-	ID_OPTIONS,
-	0
+
+/////////////////////////////////////////////////////////////////////
+// Data loading section
+#define TOOLBAR_BEGIN void Toolbar_Begin(Toolbar* toolbar){Toolbar_Data td;
+#define TOOLBAR_END }
+
+#define TAB_BEGIN(a,b) Tab_Begin(&td,a,b);
+#define TAB_END Tab_End(&td, toolbar);
+
+#define BUTTON(a,b,c) Add_Button(&(td.Data[td.Count++]),a,b,c);
+#define SEPARATOR Add_Separator(&(td.Data[td.Count++]));
+#define DROPPER(a,b,c) Add_Dropper(&(td.Data[td.Count++]),a,b,c);
+
+struct Toolbar_Data
+{
+    LPCTSTR Name;
+    bool HasRunStop;
+    TBBUTTON Data[20];
+    int Count;
 };
-LPCTSTR ButtonMsg[] = {
-    "Load", NULL, "Run", "Stop", NULL, "Options"
+
+void Tab_Begin(Toolbar_Data* td, LPCTSTR Name, bool HasRunStop)
+{
+    td->Count = 0;
+    td->Name = Name;
+    td->HasRunStop = HasRunStop;
+}
+
+void Add_Button(TBBUTTON* tb, LPCTSTR Name, Command c, Icon i)
+{
+    tb->iString = (INT_PTR) Name;
+    tb->idCommand = c;
+    tb->iBitmap = i;
+    tb->fsStyle = TBSTYLE_BUTTON;
+    tb->fsState = TBSTATE_ENABLED;
+    tb->dwData = NULL;
+}
+
+void Add_Dropper(TBBUTTON* tb, LPCTSTR Name, Command c, Icon i)
+{
+    Add_Button(tb, Name, c, i);
+    tb->fsStyle = BTNS_WHOLEDROPDOWN;
+}
+
+void Add_Separator(TBBUTTON* tb)
+{
+    Add_Button(tb, NULL, (Command) 0, (Icon) 0);
+    tb->fsStyle = TBSTYLE_SEP;
+}
+
+void Tab_End(Toolbar_Data* td, Toolbar* toolbar)
+{
+    // Create the toolbar
+    HWND hToolbar = CreateWindowEx(
+		WS_EX_TRANSPARENT,
+		TOOLBARCLASSNAME, NULL,
+        WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | CCS_NODIVIDER | CCS_NOPARENTALIGN | TBSTYLE_LIST | CCS_NOMOVEY | CCS_NORESIZE,
+		20, 40, 600, 50,
+        toolbar->hWnd, (HMENU) (int) 0, hInst, NULL);
+
+	SendMessage(hToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
+
+    SendMessage(hToolbar, TB_SETIMAGELIST, 0, (LPARAM) toolbar->hNormalIml);
+    SendMessage(hToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM) toolbar->hDisableIml);
+
+    SendMessage(hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(32,32));
+    SendMessage(hToolbar, TB_ADDBUTTONS, td->Count, (LPARAM) td->Data);
+
+    // Now resize each button appropriately
+    HDC hDC = GetDC(hToolbar);
+    SIZE sz;
+    TBBUTTONINFO tbi;
+    tbi.cbSize = sizeof(tbi);
+    tbi.dwMask = TBIF_SIZE;
+    for (int i = 0; i < td->Count; i++)
+    {
+        if (td->Data[i].fsStyle != TBSTYLE_SEP)
+        {
+            LPCTSTR str = (LPCTSTR) td->Data[i].iString;
+            GetTextExtentPoint(hDC, str, (int) strlen(str), &sz);
+            tbi.cx = (WORD) sz.cx + 40;
+            SendMessage(hToolbar, TB_SETBUTTONINFO, td->Data[i].idCommand, (LPARAM) &tbi);
+        }
+    }
+    ReleaseDC(hToolbar, hDC);
+
+
+    // Set up the tabs
+    TCITEM tci;
+    tci.mask = TCIF_TEXT;
+    tci.pszText = (LPTSTR) td->Name;
+    TabCtrl_InsertItem(toolbar->hTab, toolbar->TabCount, &tci);
+
+    if (toolbar->TabCount == 0)
+        ShowWindow(hToolbar, SW_SHOW);
+
+    // Move the data to the toolbar
+    toolbar->Tabs[toolbar->TabCount].HasRunStop = td->HasRunStop;
+    toolbar->Tabs[toolbar->TabCount].hToolbar = hToolbar;
+    toolbar->TabCount++;
+}
+
+
+#include "ToolbarData.h"
+
+INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+/////////////////////////////////////////////////////////////////////
+// General section
+Toolbar::Toolbar(HWND hParent)
+{
+    hWnd = CreateDialog(hInst, MAKEINTRESOURCE(CTL_TOOLBAR), hParent, ToolbarDialogProc);
+    hTab = GetDlgItem(hWnd, TAB_LIST);
+    SetWindowLongPtr(hWnd, DWL_USER, (LONG) this);
+
+	hNormalIml = ImageList_Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 0);
+	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(BMP_TOOLBAR));
+    ImageList_AddMasked(hNormalIml, hBmp, RGB(255,0,255));
+    DeleteObject(hBmp);
+
+    // create the image list
+    hDisableIml = ImageList_Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 0);
+	hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(BMP_TOOLBAR_DIS));
+    ImageList_AddMasked(hDisableIml, hBmp, RGB(255,0,255));
+    DeleteObject(hBmp);
+
+    TabCount = 0;
+    Toolbar_Begin(this);
+    RunningChanged(false);
 };
 
-void EnableButton(int id, bool Enable)
+void Toolbar::RunningChanged(bool Running)
 {
     TBBUTTONINFO tbi;
     tbi.cbSize = sizeof(tbi);
     tbi.dwMask = TBIF_STATE;
-    tbi.fsState = (Enable ? TBSTATE_ENABLED : 0);
-	SendMessage(hToolbar, TB_SETBUTTONINFO, id, (LPARAM) &tbi);
-}
-
-void ToolbarInit()
-{
-	int i;
-    int AnyButtons = 0, RealButtons = 0;
-
-    for (AnyButtons = 0; Buttons[AnyButtons] != 0; AnyButtons++)
-		; // no code required
-
-    TBBUTTON* TbButtons = new TBBUTTON[AnyButtons];
-    for (i = 0; i < AnyButtons; i++)
-	{
-		if (Buttons[i] == -1)
-		{
-			TbButtons[i].iBitmap = 0;
-			TbButtons[i].fsStyle = BTNS_SEP;
-			TbButtons[i].idCommand = 0;
-		}
-		else
-		{
-			TbButtons[i].iBitmap = RealButtons;
-			RealButtons++;
-			TbButtons[i].idCommand = Buttons[i];
-			TbButtons[i].fsStyle = (Buttons[i] == ID_OPEN || Buttons[i] == ID_OPTIONS ? TBSTYLE_DROPDOWN : TBSTYLE_BUTTON);
-		}
-		TbButtons[i].fsState = TBSTATE_ENABLED;
-		TbButtons[i].dwData = (DWORD_PTR) NULL;
-		TbButtons[i].iString = (INT_PTR) NULL; //ButtonMsg[i];
-    }
-
-    hToolbar = CreateWindowEx(
-		0,
-		TOOLBARCLASSNAME, NULL,
-		TBSTYLE_TOOLTIPS | WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | TBSTYLE_FLAT | TBSTYLE_LIST,
-		// TBSTYLE_TOOLTIPS | WS_CHILD | WS_VISIBLE | TBSTYLE_WRAPABLE | /*CCS_NORESIZE |*/ CCS_NODIVIDER | TBSTYLE_FLAT,
-		0, 0, 600, 40,
-		G_hWnd, (HMENU) (int) ID_TOOLBAR, G_hInstance, NULL);
-
-	SendMessage(hToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
-
-    // create the image list
-	HIMAGELIST hImgList = ImageList_Create(32, 32, ILC_COLOR24 | ILC_MASK, RealButtons, RealButtons);
-	HBITMAP hBmp = LoadBitmap(G_hInstance, MAKEINTRESOURCE(BMP_TOOLBAR));
-    ImageList_AddMasked(hImgList, hBmp, RGB(255,0,255));
-    DeleteObject(hBmp);
-    SendMessage(hToolbar, TB_SETIMAGELIST, 0, (LPARAM) hImgList);
-
-    // create the image list
-    hImgList = ImageList_Create(32, 32, ILC_COLOR24 | ILC_MASK, RealButtons, RealButtons);
-	hBmp = LoadBitmap(G_hInstance, MAKEINTRESOURCE(BMP_TOOLBAR_DIS));
-    ImageList_AddMasked(hImgList, hBmp, RGB(255,0,255));
-    DeleteObject(hBmp);
-	SendMessage(hToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM) hImgList);
-
-    // setup the toolbar properties
-    SendMessage(hToolbar, TB_SETBUTTONSIZE, 0, MAKELONG(42,42));
-    SendMessage(hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(32,32));
-    SendMessage(hToolbar, TB_ADDBUTTONS, AnyButtons, (LPARAM) TbButtons);
-    delete[] TbButtons;
-
-	MoveWindow(hToolbar, 0, 0, 600, 80, TRUE);
-}
-
-BOOL ToolbarNotify(LPNMHDR nmhdr)
-{
-	if (nmhdr->code == TBN_DROPDOWN)
-	{
-		LPNMTOOLBAR nmtoolbar = (LPNMTOOLBAR) nmhdr;
-        HMENU hItem;
-		if (nmtoolbar->iItem == ID_OPEN)
-            hItem = RecentFilesMenu();
-        else if (nmtoolbar->iItem == ID_OPTIONS)
+    for (int i = 0; i < TabCount; i++)
+    {
+        if (Tabs[i].HasRunStop)
         {
-            hItem = GetSubMenu(LoadMenu(G_hInstance, MAKEINTRESOURCE(MNU_COMPILER)), 0);
-            CheckMenuRadioItem(hItem, 0, 0, 0, MF_BYPOSITION);
+            int Disable = Running ? cmdStop : cmdRun;
+            int Enable = !Running ? cmdRun : cmdStop;
+
+            tbi.fsState = 0;
+            SendMessage(Tabs[i].hToolbar, TB_SETBUTTONINFO, Disable, (LPARAM) &tbi);
+            tbi.fsState = TBSTATE_ENABLED;
+            SendMessage(Tabs[i].hToolbar, TB_SETBUTTONINFO, Enable, (LPARAM) &tbi);
         }
+    }
+}
+
+void ToolbarResize(Toolbar* toolbar)
+{
+    RECT rc;
+    GetClientRect(toolbar->hWnd, &rc);
+    MoveWindow(toolbar->hTab, 5, 5, rc.right - 10, rc.bottom - 10, TRUE);
+
+    int i = TabCtrl_GetCurSel(toolbar->hTab);
+    MoveWindow(toolbar->Tabs[i].hToolbar, 10, 30, rc.right - 20, 42, TRUE);
+}
+
+BOOL ToolbarNotify(Toolbar* toolbar, LPNMHDR nmhdr)
+{
+    if (nmhdr->code == TCN_SELCHANGE || nmhdr->code == TCN_SELCHANGING)
+    {
+        int i = TabCtrl_GetCurSel(nmhdr->hwndFrom);
+        ShowWindow(toolbar->Tabs[i].hToolbar, (nmhdr->code == TCN_SELCHANGE ? SW_SHOW : SW_HIDE));
+        ToolbarResize(toolbar);
+    }
+    else if (nmhdr->code == TBN_DROPDOWN)
+    {
+		LPNMTOOLBAR nmtoolbar = (LPNMTOOLBAR) nmhdr;
+        HMENU hMenu = app->QueryCommand((Command) nmtoolbar->iItem);
+        if (hMenu == NULL)
+            return FALSE;
 
         RECT rc;
-		SendMessage(hToolbar, TB_GETRECT, nmtoolbar->iItem, (LPARAM) &rc);
+        SendMessage(nmhdr->hwndFrom, TB_GETRECT, nmtoolbar->iItem, (LPARAM) &rc);
 
 		POINT pt;
 		pt.x = rc.left;
 		pt.y = rc.bottom;
-		ClientToScreen(hToolbar, &pt);
+		ClientToScreen(nmhdr->hwndFrom, &pt);
 
-		TrackPopupMenu(hItem,
+		TrackPopupMenu(hMenu,
 			TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-			pt.x, pt.y, 0, G_hWnd, NULL);
-	}
+            pt.x, pt.y, 0, toolbar->hWnd, NULL);
+    }
     else if (nmhdr->code == TTN_GETDISPINFO)
     {
+        /*
         LPTOOLTIPTEXT tt = (LPTOOLTIPTEXT) nmhdr;
         tt->hinst = NULL;
         for (int i = 0; Buttons[i] != 0; i++)
@@ -120,7 +203,22 @@ BOOL ToolbarNotify(LPNMHDR nmhdr)
             if (Buttons[i] == nmhdr->idFrom)
                 strcpy(tt->szText, ButtonMsg[i]);
         }
+        */
     }
 	return FALSE;
 }
 
+INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch(uMsg)
+    {
+    case WM_NOTIFY:
+        return ToolbarNotify((Toolbar*) GetWindowLong(hWnd, DWL_USER), (LPNMHDR) lParam);
+        break;
+
+    case WM_SIZE:
+        ToolbarResize((Toolbar*) GetWindowLong(hWnd, DWL_USER));
+        break;
+    }
+    return FALSE;
+}

@@ -1,8 +1,8 @@
 #include "Header.h"
+#include "Application.h"
 
 // Shared variables
-HINSTANCE G_hInstance;
-HWND      G_hWnd;
+HINSTANCE hInst;
 
 
 INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow)
@@ -11,8 +11,8 @@ INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
     LoadLibrary("RICHED32.DLL");
 
     // Save application instance
-    G_hInstance = hInstance;
-    ShowMainDialog();
+    hInst = hInstance;
+    app = new Application();
 
 	MSG msg;
     while (GetMessage(&msg, NULL, 0, 0) > 0)

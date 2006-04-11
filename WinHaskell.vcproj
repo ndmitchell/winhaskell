@@ -115,6 +115,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\Application.cpp">
+			</File>
+			<File
 				RelativePath=".\Commands.cpp">
 			</File>
 			<File
@@ -131,6 +134,12 @@
 			</File>
 			<File
 				RelativePath=".\MainDialog.cpp">
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Output.cpp">
@@ -143,9 +152,6 @@
 			</File>
 			<File
 				RelativePath=".\StartCode.cpp">
-			</File>
-			<File
-				RelativePath=".\Toolbar.cpp">
 			</File>
 			<File
 				RelativePath=".\WrapHugs.cpp">
@@ -188,11 +194,27 @@
 					RelativePath=".\Interpreter.h">
 				</File>
 			</Filter>
+			<Filter
+				Name="UI"
+				Filter="">
+				<File
+					RelativePath=".\Toolbar.cpp">
+				</File>
+				<File
+					RelativePath=".\Toolbar.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\Application.h">
+			</File>
+			<File
+				RelativePath=".\Command.h">
+			</File>
 			<File
 				RelativePath=".\Commands.h">
 			</File>
@@ -204,6 +226,9 @@
 			</File>
 			<File
 				RelativePath=".\History.h">
+			</File>
+			<File
+				RelativePath=".\Icon.h">
 			</File>
 			<File
 				RelativePath=".\Input.h">
@@ -224,7 +249,7 @@
 				RelativePath=".\resource.h">
 			</File>
 			<File
-				RelativePath=".\Toolbar.h">
+				RelativePath=".\ToolbarData.h">
 			</File>
 			<File
 				RelativePath=".\WrapHugs.h">

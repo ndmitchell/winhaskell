@@ -4,6 +4,7 @@
 #include "Lexer.h"
 #include "Commands.h"
 #include "Completion.h"
+//#include "Application.h"
 
 HWND hInput;
 int CharWidth;
@@ -200,7 +201,7 @@ BOOL InputNotify(NMHDR* nmhdr)
 
 	if (Cancel)
 	{
-		SetWindowLong(G_hWnd, DWL_MSGRESULT, 1);
+        SetWindowLong(NULL, DWL_MSGRESULT, 1);
 		return TRUE;
 	}
 	return FALSE;
