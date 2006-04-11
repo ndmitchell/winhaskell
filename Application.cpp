@@ -24,6 +24,7 @@ Application::Application()
     ShowMainDialog();
 
     recentFiles = new RecentFiles();
+    history = new History();
     interpreter = (Interpreter*) StartHugs();
 }
 
@@ -38,6 +39,7 @@ void Application::FireCommand(Command c, int Param)
         output->Append(Buffer);
         output->Append("\n");
         input->SelAll();
+        history->Add(Buffer);
         interpreter->Evaluate(Buffer);
         toolbar->RunningChanged(true);
         break;

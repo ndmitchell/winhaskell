@@ -1,4 +1,5 @@
 #include "Header.h"
+#include "History.h"
 
 // The history code
 // Add to the history, get from the history with a delta
@@ -6,49 +7,50 @@
 // pushing above top should return top again
 
 // the oldest history is at the lowest number
-const int HistoryMax = 25;
-
-LPSTR History[HistoryMax];
-int HistoryPos = 0;
-int HistoryCount = 0;
 
 LPCSTR Blank = "";
 
-void HistoryAdd(LPCSTR Item)
+History::History()
 {
-    if (HistoryCount != 0 &&
-		strcmp(Item, History[HistoryCount-1]) == 0)
+    Pos = 0;
+    Count = 0;
+}
+
+void History::Add(LPCSTR Item)
+{
+    if (Count != 0 &&
+		strcmp(Item, Items[Count-1]) == 0)
 	{
-		HistoryPos = HistoryCount;
+		Pos = Count;
 		return; //duplicate, eat it
     }
 
-    if (HistoryCount == HistoryMax)
+    if (Count == HistoryMax)
 	{
 		int i;
-		free(History[0]);
-		for (i = 1; i < HistoryCount; i++)
-			History[i-1] = History[i];
-		HistoryCount--;
+		free(Items[0]);
+		for (i = 1; i < Count; i++)
+			Items[i-1] = Items[i];
+		Count--;
     }
 
     // there is now space for it
-    History[HistoryCount] = strdup(Item);
-    HistoryCount++;
-    HistoryPos = HistoryCount;
+    Items[Count] = strdup(Item);
+    Count++;
+    Pos = Count;
 }
 
-LPCSTR HistoryGet(int Delta)
+LPCSTR History::Get(int Delta)
 {
     // set a new value, with sanity checks
-    HistoryPos += Delta;
-    if (HistoryPos > HistoryCount)
-		HistoryPos = HistoryCount;
-    if (HistoryPos < 0)
-		HistoryPos = 0;
+    Pos += Delta;
+    if (Pos > Count)
+		Pos = Count;
+    if (Pos < 0)
+		Pos = 0;
 
-    if (HistoryPos == HistoryCount)
+    if (Pos == Count)
 		return Blank;
     else
-		return History[HistoryPos];
+		return Items[Pos];
 }

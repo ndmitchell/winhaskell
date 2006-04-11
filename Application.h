@@ -6,6 +6,8 @@ class Compiler;
 class Input;
 class Output;
 class RecentFiles;
+class History;
+
 enum Command;
 
 extern Application* app;
@@ -30,6 +32,7 @@ public:
     Input* input;
     Output* output;
     RecentFiles* recentFiles;
+    History* history;
 
 //private:
     HWND hWnd;

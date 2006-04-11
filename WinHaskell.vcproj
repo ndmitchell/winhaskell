@@ -124,9 +124,6 @@
 				RelativePath=".\Completion.cpp">
 			</File>
 			<File
-				RelativePath=".\History.cpp">
-			</File>
-			<File
 				RelativePath=".\Lexer.cpp">
 			</File>
 			<File
@@ -217,6 +214,16 @@
 					RelativePath=".\RecentFiles.h">
 				</File>
 			</Filter>
+			<Filter
+				Name="Inputs"
+				Filter="">
+				<File
+					RelativePath=".\History.cpp">
+				</File>
+				<File
+					RelativePath=".\History.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -236,9 +243,6 @@
 			</File>
 			<File
 				RelativePath=".\Header.h">
-			</File>
-			<File
-				RelativePath=".\History.h">
 			</File>
 			<File
 				RelativePath=".\Icon.h">
@@ -294,10 +298,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">
