@@ -13,6 +13,7 @@ public:
 
     void RunningChanged(bool Running);
     int Height(){return 80;}
+    Command DefaultCommand();
 
 //private:
     HWND hWnd;

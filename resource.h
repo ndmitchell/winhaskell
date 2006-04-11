@@ -12,6 +12,9 @@
 #define MNU_COMPILER                    115
 #define DLG_COMPLETION                  116
 #define CTL_TOOLBAR                     117
+#define CTL_INPUT                       120
+#define IDD_DIALOG1                     121
+#define CTL_OUTPUT                      121
 #define rtf                             1001
 #define rtfOutput                       1001
 #define txt                             1002
@@ -31,7 +34,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        119
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40018
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101

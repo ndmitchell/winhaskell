@@ -4,10 +4,11 @@
 #include "Lexer.h"
 #include "Commands.h"
 #include "Completion.h"
-//#include "Application.h"
+#include "Application.h"
 
-HWND hInput;
 int CharWidth;
+
+const int MaxInputSize = 500;
 
 const bool ShowAutoComplete = true;
 
@@ -19,42 +20,52 @@ Completion* CompCode = NULL;
 Completion* Active = NULL;
 LexItem CompItem;
 
-void InputInit(HWND hInput)
+
+INT_PTR CALLBACK InputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+
+Input::Input(HWND hParent)
 {
-	::hInput = hInput;
+	hWnd = CreateDialog(hInst, MAKEINTRESOURCE(CTL_INPUT), hParent, InputDialogProc);
+    hRTF = GetDlgItem(hWnd, rtfInput);
 
     //make it all protected
 	//might want to enable SELCHANGE later, to reduce SETSEL calls
-    SendMessage(hInput, EM_SETEVENTMASK, 0, ENM_KEYEVENTS | ENM_SELCHANGE | ENM_CHANGE);
+    SendMessage(hRTF, EM_SETEVENTMASK, 0, ENM_KEYEVENTS | ENM_SELCHANGE | ENM_CHANGE);
 
 	CHARFORMAT cf;
     cf.cbSize = sizeof(CHARFORMAT);
     cf.dwMask = CFM_FACE | CFM_SIZE;
 	strcpy(cf.szFaceName, "Courier New");
 	cf.yHeight = 200;
-    SendMessage(hInput, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
+    SendMessage(hRTF, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
 
     // Give lots of space for buffer manips
-    SendMessage(hInput, EM_LIMITTEXT, MaxInputSize - 50, 0);
+    SendMessage(hRTF, EM_LIMITTEXT, MaxInputSize - 50, 0);
 
-    HDC hDC = GetDC(hInput);
+    HDC hDC = GetDC(hRTF);
     SIZE sz;
     BOOL b = GetTextExtentPoint(hDC, "WINHASKELL", 10, &sz);
     CharWidth = (b ? sz.cx / 10 : 10);
-    ReleaseDC(hInput, hDC);
+    ReleaseDC(hRTF, hDC);
 }
 
-void InputGet(LPTSTR Buffer)
+void Input::Get(LPTSTR Buffer)
 {
-	GetWindowText(hInput, Buffer, MaxInputSize);
+	GetWindowText(hRTF, Buffer, MaxInputSize);
 }
 
-void InputSet(LPCTSTR Buffer)
+void Input::Set(LPCTSTR Buffer)
 {
-    SetWindowText(hInput, Buffer);
+    SetWindowText(hRTF, Buffer);
 }
 
-void InputChanged()
+void Input::SelAll()
+{
+    SendMessage(hRTF, EM_SETSEL, 0, -1);
+}
+
+void InputChanged(HWND hInput)
 {
     CHARRANGE cr;
     SendMessage(hInput, EM_EXGETSEL, 0, (LPARAM) &cr);
@@ -107,7 +118,7 @@ void InputChanged()
 
     //Now give command help if appropriate
     bool ShowComplete = false;
-    Command* c = GetCommand(Buffer);
+    Action* c = GetCommand(Buffer);
     if (c != NULL)
     {
         SetStatusBar(c->Help);
@@ -150,7 +161,7 @@ void InputChanged()
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);
 }
 
-void CompletionFinish()
+void CompletionFinish(HWND hInput)
 {
     TCHAR Buffer[100];
     Active->GetCurrent(Buffer);
@@ -162,7 +173,7 @@ void CompletionFinish()
     Active = NULL;
 }
 
-BOOL InputNotify(NMHDR* nmhdr)
+BOOL InputNotify(HWND hWnd, LPNMHDR nmhdr)
 {
 	bool Cancel = false;
 
@@ -175,16 +186,16 @@ BOOL InputNotify(NMHDR* nmhdr)
 			{
 				Cancel = true;
                 if (Active == NULL)
-				    MainDialogFireCommand();
+				    app->DefaultCommand();
                 else
-                    CompletionFinish();
+                    CompletionFinish(nmhdr->hwndFrom);
 			}
 			else if (mf->wParam == VK_UP || mf->wParam == VK_DOWN)
 			{
 				Cancel = true;
                 int Dir = (mf->wParam == VK_UP ? -1 : +1);
                 if (Active == NULL)
-				    SetWindowText(hInput, HistoryGet(Dir));
+                    SetWindowText(nmhdr->hwndFrom, HistoryGet(Dir));
                 else
                     Active->SetCurrentDelta(Dir);
 			}
@@ -194,15 +205,41 @@ BOOL InputNotify(NMHDR* nmhdr)
             if (mf->wParam == VK_TAB && Active != NULL)
             {
                 Cancel = true;
-                CompletionFinish();
+                CompletionFinish(nmhdr->hwndFrom);
             }
         }
 	}
 
 	if (Cancel)
 	{
-        SetWindowLong(NULL, DWL_MSGRESULT, 1);
+        SetWindowLong(hWnd, DWL_MSGRESULT, 1);
 		return TRUE;
 	}
 	return FALSE;
 }
+
+
+INT_PTR CALLBACK InputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch(uMsg)
+    {
+    case WM_SIZE:
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+            MoveWindow(GetDlgItem(hWnd, rtfInput), 0, 0, rc.right, rc.bottom, TRUE);
+        }
+        break;
+
+    case WM_COMMAND:
+        if (HIWORD(wParam) == EN_CHANGE)
+            InputChanged((HWND) lParam);
+        break;
+
+    case WM_NOTIFY:
+        return InputNotify(hWnd, (LPNMHDR) lParam);
+        break;
+    }
+    return FALSE;
+}
+

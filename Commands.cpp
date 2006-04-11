@@ -2,7 +2,7 @@
 #include "Commands.h"
 #include "Completion.h"
 
-Command Commands[] =
+Action Commands[] =
 {
     {true, "load", ":load <filenames>, load modules from specified files"},
     {true, "also", ":also <filenames>, read additional modules"},
@@ -23,15 +23,15 @@ Command Commands[] =
     {true, NULL, NULL}
 };
 
-Command CmdUnknown = {false, "unknown", "Unknown command"};
-Command CmdEmpty = {false, "blank", "Type a command now"};
+Action CmdUnknown = {false, "unknown", "Unknown command"};
+Action CmdEmpty = {false, "blank", "Type a command now"};
 
 bool IsEmpty(TCHAR c)
 {
     return (c == 0 || isspace(c));
 }
 
-Command* GetCommand(LPCTSTR Cmd)
+Action* GetCommand(LPCTSTR Cmd)
 {
     LPCTSTR c = Cmd;
     while (isspace(*c))
@@ -40,7 +40,7 @@ Command* GetCommand(LPCTSTR Cmd)
         return NULL;
 
     int BestMatch = 0;
-    Command* BestCommand = (IsEmpty(c[1]) ? &CmdEmpty : &CmdUnknown);
+    Action* BestCommand = (IsEmpty(c[1]) ? &CmdEmpty : &CmdUnknown);
 
     for (int i = 0; Commands[i].Name != NULL; i++)
     {

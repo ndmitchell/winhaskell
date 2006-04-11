@@ -10,6 +10,8 @@
 #include "History.h"
 #include "Lexer.h"
 #include "RecentFiles.h"
+#include "Command.h"
+
 
 Application* app;
 
@@ -20,21 +22,52 @@ Application::Application()
 {
     app = this;
     ShowMainDialog();
+
+    recentFiles = new RecentFiles();
+    interpreter = (Interpreter*) StartHugs();
 }
 
 void Application::FireCommand(Command c, int Param)
 {
+    switch (c)
+    {
+    case cmdRun:
+        TCHAR Buffer[500];
+        input->Get(Buffer);
+        output->SetColor(BLACK);
+        output->Append(Buffer);
+        output->Append("\n");
+        input->SelAll();
+        interpreter->Evaluate(Buffer);
+        toolbar->RunningChanged(true);
+        break;
+
+    case cmdStop:
+        interpreter->AbortComputation();
+        break;
+
+    default:
+        output->Append("Command not handled, give me mon\xffy to implement this\n");
+    }
 }
 
 HMENU Application::QueryCommand(Command c)
 {
-    return GetSystemMenu(app->hWnd, FALSE);
+    if (c == cmdRecent)
+        return recentFiles->GetMenu();
+    else
+        return NULL;
 }
 
-void ExecutionComplete()
+void Application::DefaultCommand()
 {
+    FireCommand(toolbar->DefaultCommand(), 0);
 }
 
+void Application::ExecutionComplete()
+{
+    toolbar->RunningChanged(false);
+}
 
 void SetStatusBar(LPCTSTR Text)
 {
@@ -44,14 +77,10 @@ void SetStatusBar(LPCTSTR Text)
 
 void MainDialogResize()
 {
-    HWND hItem;
 	int Height;
 	RECT rcWnd, rc;
 
     HWND G_hWnd = app->hWnd;
-
-	HWND hRtfInput = GetDlgItem(G_hWnd, rtfInput);
-	HWND hRtfOutput = GetDlgItem(G_hWnd, rtfOutput);
 
 	GetClientRect(G_hWnd, &rcWnd);
 	Height = rcWnd.bottom;
@@ -59,20 +88,19 @@ void MainDialogResize()
     int ToolbarHeight = app->toolbar->Height();
     MoveWindow(app->toolbar->hWnd, 0, 0, rcWnd.right, ToolbarHeight, TRUE);
 
-	hItem = GetDlgItem(G_hWnd, ID_STATUS);
-	GetClientRect(hItem, &rc);
-    MoveWindow(hItem, 0, Height - rc.bottom,
+    GetClientRect(app->hStatus, &rc);
+    MoveWindow(app->hStatus, 0, Height - rc.bottom,
 		rcWnd.right, rc.bottom, TRUE);
 	Height -= rc.bottom + 3;
 
 	int txtHeight = (false ? 100 : 24);
-	MoveWindow(hRtfInput, 0, Height - txtHeight,
-		rcWnd.right - 28, txtHeight, TRUE);
-	MoveWindow(GetDlgItem(G_hWnd, ID_EXPAND), rcWnd.right - 25,
-		Height - 25 + 5, 25, 25, TRUE);
+	MoveWindow(app->input->hWnd, 0, Height - txtHeight,
+		rcWnd.right, txtHeight, TRUE);
+	//MoveWindow(GetDlgItem(G_hWnd, ID_EXPAND), rcWnd.right - 25,
+	//	Height - 25 + 5, 25, 25, TRUE);
 	Height -= txtHeight + 3;
 
-	MoveWindow(hRtfOutput, 0, ToolbarHeight,
+    MoveWindow(app->output->hWnd, 0, ToolbarHeight,
 		rcWnd.right, Height - ToolbarHeight, TRUE);
 }
 
@@ -113,27 +141,29 @@ void MainDialogInit()
 //    RegistryReadWindowPos(G_hWnd);
 
     app->toolbar = new Toolbar(app->hWnd);
+    app->input = new Input(app->hWnd);
+    app->output = new Output(app->hWnd);
+
 
     //RecentFilesInit();
 	//MainDialogInitArrows();
-    //CreateStatusWindow(WS_CHILD | WS_VISIBLE, "Welcome to WinHaskell", G_hWnd, ID_STATUS);
+    app->hStatus = CreateStatusWindow(WS_CHILD | WS_VISIBLE, "Welcome to WinHaskell", app->hWnd, 0);
 	MainDialogResize();
 
 	SendMessage(G_hWnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIcon(hInst, MAKEINTRESOURCE(1)));
 
-	OutputInit(GetDlgItem(G_hWnd, rtfOutput));
-	OutputColor(GREEN);
-	OutputAppend("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
-	OutputColor(BLACK);
+    app->output->SetColor(GREEN);
+    app->output->Append("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
+    app->output->SetColor(BLACK);
 
-	InputInit(GetDlgItem(G_hWnd, rtfInput));
 
 	//Wrap = WrapperInit();
-    StartHugs();
+   // StartHugs();
 }
 
 void FireCommand()
 {
+    /*
     TCHAR Command[MaxInputSize];
     InputGet(Command);
 
@@ -154,17 +184,20 @@ void FireCommand()
 	}
 
 	//Wrap->RunCommand(Command);
+    */
 }
 
 
 void MainDialogFireCommand()
 {
-    TCHAR Buffer[MaxInputSize];
+    /*
+    TCHAR Buffer[500];
 	InputGet(Buffer);
 	if (Buffer[0] == 0)
         InputSet(":main");
 
 	FireCommand();
+    */
 }
 
 void FlipExpand()
@@ -260,6 +293,7 @@ BOOL MainDialogNotify(LPNMHDR nmhdr)
 
 void MainDialogDropFiles(HDROP hDrop)
 {
+    /*
     char Command[MAX_PATH], File[MAX_PATH];
 
     DragQueryFile(hDrop, 0, File, MAX_PATH);
@@ -273,6 +307,7 @@ void MainDialogDropFiles(HDROP hDrop)
     wsprintf(Command, ":load \"%s\"", File);
     InputSet(Command);
     FireCommand();
+    */
 }
 
 INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

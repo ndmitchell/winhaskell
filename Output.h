@@ -1,7 +1,25 @@
 
-void OutputInit(HWND hRTF);
-void OutputBold(bool Bold);
-void OutputAppend(LPCTSTR Text);
 void OutputTimer();
-void OutputColor(int Color);
-void OutputCopy(HWND hCopy);
+
+
+class Output
+{
+public:
+    Output(HWND hParent);
+    ~Output();
+
+    void SetBold(bool Bold);
+    void SetColor(int Color);
+
+    void Append(LPCTSTR Text);
+
+    //Anything in the buffer from now on is frozen
+    //Cannot be undone
+    //void Freeze();
+    //Move back one character
+    //void Rewind();
+
+// private:
+    HWND hWnd;
+    HWND hRTF;
+};

@@ -1,6 +1,17 @@
-void RecentFilesInit();
-HMENU RecentFilesMenu();
 
-// Return NULL if the recent file is not in the list
-LPCTSTR RecentFilesGet(int Id);
-void RecentFilesAdd(LPCTSTR Item);
+const int MruCount = 9;
+
+class RecentFiles
+{
+public:
+    RecentFiles();
+    ~RecentFiles();
+
+    HMENU GetMenu();
+    LPCTSTR Get(int Id);
+    void Add(LPCTSTR Item);
+
+private:
+    LPTSTR Items[MruCount+1];
+    HMENU hMenu;
+};

@@ -6,6 +6,7 @@
 */
 #include "Header.h"
 #include "Output.h"
+#include "Application.h"
 
 #define MAXIMUM_BUFFER   100000
 
@@ -159,7 +160,7 @@ BOOL ParseEscapeCode(Format* f)
 	    s = &EscBuf[i+1];
 
 		if (Val == 50)
-			ExecutionComplete();
+			app->ExecutionComplete();
 		else if (Val == 0)
 		*f = DefFormat;
 	    else if (Val == 1)
@@ -369,4 +370,50 @@ void OutputCopy(HWND hCopy)
         SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
         SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Buf2);
     }
+}
+
+
+// Output class
+
+INT_PTR CALLBACK OutputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_SIZE:
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+            MoveWindow(hRTF, 0, 0, rc.right, rc.bottom, TRUE);
+        }
+        break;
+    }
+    return FALSE;
+}
+
+Output::Output(HWND hParent)
+{
+    hWnd = CreateDialog(hInst, MAKEINTRESOURCE(CTL_OUTPUT), hParent, OutputDialogProc);
+    hRTF = GetDlgItem(hWnd, rtfOutput);
+    ::hRTF = hRTF;
+    OutputInit(hRTF);
+}
+
+Output::~Output()
+{
+}
+
+void Output::Append(LPCTSTR Text)
+{
+    OutputAppend(Text);
+
+}
+
+void Output::SetBold(bool Bold)
+{
+    OutputBold(Bold);
+}
+
+void Output::SetColor(int Color)
+{
+    OutputColor(Color);
 }

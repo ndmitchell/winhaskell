@@ -61,9 +61,9 @@ void Tab_End(Toolbar_Data* td, Toolbar* toolbar)
     HWND hToolbar = CreateWindowEx(
 		WS_EX_TRANSPARENT,
 		TOOLBARCLASSNAME, NULL,
-        WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | CCS_NODIVIDER | CCS_NOPARENTALIGN | TBSTYLE_LIST | CCS_NOMOVEY | CCS_NORESIZE,
+        WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT |  TBSTYLE_TRANSPARENT | CCS_NODIVIDER | CCS_NOPARENTALIGN | TBSTYLE_LIST | CCS_NOMOVEY | CCS_NORESIZE,
 		20, 40, 600, 50,
-        toolbar->hWnd, (HMENU) (int) 0, hInst, NULL);
+        toolbar->hTab /*toolbar->hWnd*/, (HMENU) (int) 0, hInst, NULL);
 
 	SendMessage(hToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
 
@@ -145,8 +145,8 @@ void Toolbar::RunningChanged(bool Running)
     {
         if (Tabs[i].HasRunStop)
         {
-            int Disable = Running ? cmdStop : cmdRun;
-            int Enable = !Running ? cmdRun : cmdStop;
+            int Enable  =  Running ? cmdStop : cmdRun;
+            int Disable = !Running ? cmdStop : cmdRun;
 
             tbi.fsState = 0;
             SendMessage(Tabs[i].hToolbar, TB_SETBUTTONINFO, Disable, (LPARAM) &tbi);
@@ -156,6 +156,15 @@ void Toolbar::RunningChanged(bool Running)
     }
 }
 
+Command Toolbar::DefaultCommand()
+{
+    int i = TabCtrl_GetCurSel(hTab);
+    if (Tabs[i].HasRunStop)
+        return cmdRun; // should give the correct runner
+    else
+        return cmdRun;
+}
+
 void ToolbarResize(Toolbar* toolbar)
 {
     RECT rc;
@@ -163,7 +172,7 @@ void ToolbarResize(Toolbar* toolbar)
     MoveWindow(toolbar->hTab, 5, 5, rc.right - 10, rc.bottom - 10, TRUE);
 
     int i = TabCtrl_GetCurSel(toolbar->hTab);
-    MoveWindow(toolbar->Tabs[i].hToolbar, 10, 30, rc.right - 20, 42, TRUE);
+    MoveWindow(toolbar->Tabs[i].hToolbar, 5, 25, rc.right - 20, 42, TRUE);
 }
 
 BOOL ToolbarNotify(Toolbar* toolbar, LPNMHDR nmhdr)
@@ -205,6 +214,26 @@ BOOL ToolbarNotify(Toolbar* toolbar, LPNMHDR nmhdr)
         }
         */
     }
+    else if (nmhdr->code == NM_CLICK)
+    {
+        DWORD Pos = GetMessagePos();
+        int Hot = SendMessage(nmhdr->hwndFrom, TB_GETHOTITEM, 0, 0);
+        if (Hot != -1)
+        {
+            TBBUTTONINFO tbi;
+            tbi.cbSize = sizeof(tbi);
+            tbi.dwMask = TBIF_BYINDEX | TBIF_COMMAND | TBIF_STYLE;
+
+            int Tab = TabCtrl_GetCurSel(toolbar->hTab);
+            SendMessage(toolbar->Tabs[Tab].hToolbar, TB_GETBUTTONINFO, Hot, (LPARAM) &tbi);
+
+            if (nmhdr->hwndFrom == toolbar->Tabs[Tab].hToolbar &&
+                tbi.fsStyle == TBSTYLE_BUTTON)
+            {
+                app->FireCommand((Command) tbi.idCommand, 0);
+            }
+        }
+    }
 	return FALSE;
 }
 
@@ -214,6 +243,10 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     {
     case WM_NOTIFY:
         return ToolbarNotify((Toolbar*) GetWindowLong(hWnd, DWL_USER), (LPNMHDR) lParam);
+        break;
+
+    case WM_COMMAND:
+        app->FireCommand((Command) LOWORD(wParam), 0);
         break;
 
     case WM_SIZE:

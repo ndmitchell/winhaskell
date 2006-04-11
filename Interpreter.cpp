@@ -3,6 +3,7 @@
 #include "Interpreter.h"
 
 #include "Output.h"
+#include "Application.h"
 
 LPCTSTR InterpreterPrompt = "\x1B[0;32m%s>\x1B[0m \x1B[50m";
 
@@ -29,15 +30,24 @@ void Interpreter::Read(LPTSTR Buffer, DWORD Size, bool Stdout)
         for (DWORD i = 0; i < Size; i++)
         {
             if (Buffer[i] == '\001')
+            {
                 Initialised = true;
+                app->output->Append(&Buffer[i+1]);
+                break;
+            }
         }
     }
-
-    OutputAppend(Buffer);
+    else
+        app->output->Append(Buffer);
 }
 
 void Interpreter::Finished()
 {
+}
+
+void Interpreter::AbortComputation()
+{
+    this->Exception();
 }
 
 void Interpreter::Evaluate(LPCTSTR Line)

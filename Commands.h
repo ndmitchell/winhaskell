@@ -1,13 +1,13 @@
 
 class Completion;
 
-struct Command
+struct Action
 {
     bool Real;
     LPCTSTR Name;
     LPCTSTR Help;
 };
 
-Command* GetCommand(LPCTSTR Cmd);
+Action* GetCommand(LPCTSTR Cmd);
 LPCTSTR GetArgument(LPCTSTR Cmd);
 void CommandsCompletion(Completion* c);

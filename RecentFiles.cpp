@@ -1,43 +1,43 @@
 #include "Header.h"
+#include "RecentFiles.h"
 
-const int MruCount = 9;
 
-// run over by one, so registry code can see the end
-// always MruBuffer[MruCount] == NULL
-char* MruBuffer[MruCount+1] = {0};
-
-const int ID_MRU = 7000;
-
-HMENU hMenu = NULL;
-
-void RecentFilesInit()
+RecentFiles::RecentFiles()
 {
-	//Nothing to do
+    hMenu = NULL;
+    for (int i = 0; i <= MruCount; i++)
+        Items[i] = 0;
 }
 
-HMENU RecentFilesMenu()
+RecentFiles::~RecentFiles()
 {
-	if (hMenu != NULL)
-		DestroyMenu(hMenu);
+    if (hMenu != NULL)
+        DestroyMenu(hMenu);
+}
+
+HMENU RecentFiles::GetMenu()
+{
+    if (hMenu != NULL)
+        DestroyMenu(hMenu);
 
 	hMenu = CreatePopupMenu();
-	if (MruBuffer[0] == NULL)
+	if (Items[0] == NULL)
 		AppendMenu(hMenu, MF_STRING | MF_GRAYED, 0, "(No recently loaded files)");
 	else
 	{
-		for (int i = 0; MruBuffer[i] != NULL; i++)
-			AppendMenu(hMenu, MF_STRING, ID_MRU + i, MruBuffer[i]);
+		for (int i = 0; Items[i] != NULL; i++)
+			AppendMenu(hMenu, MF_STRING, i, Items[i]);
 	}
 	return hMenu;
 }
 
 // Return NULL if the recent file is not in the list
-LPCTSTR RecentFilesGet(int Id)
+LPCTSTR RecentFiles::Get(int Id)
 {
 	return NULL;
 }
 
-void RecentFilesAdd(LPCTSTR Item)
+void RecentFiles::Add(LPCTSTR Item)
 {
     // if its already in the list move it to the top
     // if its not, add it at the top
@@ -45,23 +45,23 @@ void RecentFilesAdd(LPCTSTR Item)
 
     // remove from the list if its already there
     Found = false;
-    for (int i = 0; MruBuffer[i] != NULL; i++)
+    for (int i = 0; Items[i] != NULL; i++)
 	{
-		Found = Found || (stricmp(MruBuffer[i], Item) == 0);
+		Found = Found || (stricmp(Items[i], Item) == 0);
 		if (Found)
-			MruBuffer[i] = MruBuffer[i+1]; //rely on trailing NULL
+			Items[i] = Items[i+1]; //rely on trailing NULL
     }
 
     // if the last entry would die, kill it now
-    if (MruBuffer[MruCount-1] != NULL)
-		free(MruBuffer[MruCount-1]);
+    if (Items[MruCount-1] != NULL)
+		free(Items[MruCount-1]);
 
     // shift everything along by one
     for (i = MruCount-1; i > 0; i--)
-		MruBuffer[i] = MruBuffer[i-1];
+		Items[i] = Items[i-1];
 
     // and put the new file at the top
-    MruBuffer[0] = strdup(Item);
+    Items[0] = strdup(Item);
 }
 
 

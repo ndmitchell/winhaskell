@@ -26,7 +26,7 @@ WrapHugs::WrapHugs()
 {
     Initialising = true;
 
-	OutputAppend("Loading Hugs... ");
+	//OutputAppend("Loading Hugs... ");
 
 	HANDLE tStdin = CreateStream(false, &hStdin);
 	HANDLE tStdout = CreateStream(true, &hStdout);
@@ -67,7 +67,7 @@ WrapHugs::WrapHugs()
 void WrapHugs::InitDone()
 {
 	Initialising = false;
-	OutputAppend(" Loaded\n");
+	//OutputAppend(" Loaded\n");
 }
 
 
@@ -97,9 +97,9 @@ void WrapHugs::ReadStdErr()
 		if(!ReadFile(hStderr, chBuf, 1, &dwRead,  NULL) || dwRead == 0)
 			break; 
 		chBuf[dwRead] = 0;
-		OutputColor(RED);
-		OutputAppend(chBuf);
-		OutputColor(BLACK);
+		//OutputColor(RED);
+		//OutputAppend(chBuf);
+		//OutputColor(BLACK);
 	} 
 }
 
@@ -123,7 +123,7 @@ void WrapHugs::ReadStdOut()
 			}
 		}
 		else if (chBuf[0] != '\r')
-			OutputAppend(chBuf);
+			;//OutputAppend(chBuf);
 	} 
 }
 
