@@ -6,7 +6,20 @@
 const int ConsoleBufferSize = 1000;
 const int ConsoleTimeout = 100;
 
-const char ConsoleEscape = '\027';
+const char ConsoleEscapeChar = 27;
+
+
+enum ConsoleEscape
+{
+	conBackspace = -1, //send backspace as Escape, since thats easier
+	conComplete = 50, //a custom escape character
+	conReset = 0,
+	conBold = 1,
+	conUnderline = 4,
+	conForeground = 30,
+	conBackground = 40,
+};
+
 
 class Console
 {
@@ -32,6 +45,7 @@ public:
 	//escape characters must come in their entirity in 0.1 seconds, or are ignored
 	//escape characters come at the front of a buffer only
     virtual void Read(LPCTSTR Buffer, DWORD Size, bool Stdout) = 0;
+	virtual void Escape(ConsoleEscape Code, bool Stdout) = 0;
 
     //Called when the computation has terminated
     virtual void Finished() = 0;
@@ -58,6 +72,7 @@ private:
 	TCHAR Buffer[ConsoleBufferSize+1];
 	DWORD BufSize;
 	void FlushBuffer();
+	void ProcessEscape();
 
 	//Flags
     bool Running;

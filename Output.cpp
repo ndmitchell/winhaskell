@@ -405,6 +405,7 @@ Output::~Output()
 void Output::Append(LPCTSTR Text)
 {
     OutputAppend(Text);
+	FlushBuffer(TRUE);
 
 }
 

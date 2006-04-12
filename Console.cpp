@@ -135,6 +135,65 @@ void Console::Tick()
 	ReleaseMutex(hMutex);
 }
 
+void Console::ProcessEscape()
+{
+	//first check its a valid/recognised escape character
+	assert(Buffer[0] == ConsoleEscapeChar);
+	int State = 0;
+
+	for (DWORD i = 0; State != -1 && i < BufSize; i++)
+	{
+		char c = Buffer[i];
+		switch (State)
+		{
+		case 0:
+			State = (c == ConsoleEscapeChar ? 1 : -1);
+			break;
+
+		case 1:
+			State = (c == '[' ? 2 : -1);
+			break;
+
+		case 2:
+			State = (c >= '0' && c <= '9' ? 3 : -1);
+			break;
+
+		case 3:
+			if (c == 'm')
+				State = 10;
+			else if (c == ';')
+				State = 2;
+			else if (c >= '0' && c <= '9')
+				State = 3;
+			else
+				State = -1;
+			break;
+
+		default:
+			State = -1;
+		}
+	}
+
+	if (State == -1)
+	{
+		FlushBuffer();
+		return;
+	}
+
+	//valid, now process it
+	for (DWORD i = 0; i < BufSize; i++)
+	{
+		if (Buffer[i] == ';' || Buffer[i] == '[')
+			Buffer[i] = 0;
+	}
+	for (DWORD i = 0; i < BufSize; i++)
+	{
+		if (Buffer[i] == 0)
+			Escape((ConsoleEscape) atoi(&Buffer[i+1]), BufStdout);
+	}
+	BufSize = 0;
+}
+
 void Console::Internal_ReadHandle(bool Stdout)
 {
 	DWORD dword;
@@ -148,19 +207,30 @@ void Console::Internal_ReadHandle(bool Stdout)
 
 		WaitForSingleObject(hMutex, INFINITE);
 
-		if ((BufSize != 0 && Stdout != BufStdout) ||
-			(BufSize >= ConsoleBufferSize) ||
-			(BufSize != 0 && chBuf[0] == ConsoleEscape))
+		if (chBuf[0] == '\b')
 		{
-			app->DelTimer(this);
 			FlushBuffer();
+			Escape(conBackspace, Stdout);
 		}
-		bool AddTimer = (BufSize == 0);
-		BufStdout = Stdout;
-		Buffer[BufSize++] = chBuf[0];
+		else
+		{
+			if ((BufSize != 0 && Stdout != BufStdout) ||
+				(BufSize >= ConsoleBufferSize) ||
+				(BufSize != 0 && chBuf[0] == ConsoleEscapeChar))
+			{
+				app->DelTimer(this);
+				FlushBuffer();
+			}
+			bool AddTimer = (BufSize == 0);
+			BufStdout = Stdout;
+			Buffer[BufSize++] = chBuf[0];
 
-		if (AddTimer)
-			app->AddTimer(this, ConsoleTimeout);
+			if (chBuf[0] == 'm' && Buffer[0] == ConsoleEscapeChar)
+				ProcessEscape();
+
+			if (AddTimer)
+				app->AddTimer(this, ConsoleTimeout);
+		}
 
 		ReleaseMutex(hMutex);
 	} 

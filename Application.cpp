@@ -78,7 +78,8 @@ void Application::AddTimer(Console* c, UINT Elapse)
 
 void Application::DelTimer(Console* c)
 {
-	KillTimer(NULL, (UINT) c);
+	//Not implemented
+	//KillTimer(NULL, (UINT) c);
 }
 
 void SetStatusBar(LPCTSTR Text)

@@ -16,6 +16,7 @@ public:
 private:
 
     virtual void Read(LPCTSTR Buffer, DWORD Size, bool Stdout);
+	virtual void Escape(ConsoleEscape Code, bool Stdout);
     virtual void Finished();
 
     bool Initialised;

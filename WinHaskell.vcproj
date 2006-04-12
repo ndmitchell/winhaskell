@@ -298,10 +298,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">

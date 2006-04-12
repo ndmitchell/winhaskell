@@ -20,25 +20,23 @@ void Interpreter::Begin(LPCTSTR Command)
 
     Start(Command);
     SetPrompt(InterpreterPrompt);
-    Evaluate("putChar '\\001'");
+    Evaluate("putChar '\\b'");
 }
 
 void Interpreter::Read(LPCTSTR Buffer, DWORD Size, bool Stdout)
 {
-    if (!Initialised)
-    {
-        for (DWORD i = 0; i < Size; i++)
-        {
-            if (Buffer[i] == '\001')
-            {
-                Initialised = true;
-                output->Append(&Buffer[i+1]);
-                break;
-            }
-        }
-    }
-    else
+    if (Initialised)
         output->Append(Buffer);
+}
+
+void Interpreter::Escape(ConsoleEscape Code, bool Stdout)
+{
+	if (!Initialised && Code == conBackspace)
+		Initialised = true;
+	else if (Code == conComplete)
+		app->ExecutionComplete();
+	else
+		; //do nothing
 }
 
 void Interpreter::Finished()
