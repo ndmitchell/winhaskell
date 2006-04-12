@@ -49,9 +49,9 @@ void Application::DelTimer(Console* c)
 	//KillTimer(NULL, (UINT) c);
 }
 
-void SetStatusBar(LPCTSTR Text)
+void Application::StatusBar(LPCTSTR Text)
 {
-    SetDlgItemText(app->hWnd, ID_STATUS, Text);
+    SetWindowText(hStatus, Text);
 }
 
 

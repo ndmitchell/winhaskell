@@ -2,45 +2,81 @@
 #include "Actions.h"
 #include "Completion.h"
 
-Action Commands[] =
+struct ActionItem
 {
-    {true, "load", ":load <filenames>, load modules from specified files"},
-    {true, "also", ":also <filenames>, read additional modules"},
-    {true, "reload", ":reload, repeat last load command"},
-    {true, "edit", ":edit, <filename>, edit file"},
-    {true, "module", ":module <module>, set module for evaluating expressions"},
-    {true, "type", ":type <expr>, print type of expression"},
-    {true, "?", ":?, display this list of commands"},
-    {true, "set", ":set <options>, set command line options"},
-    {true, "names", ":names [pat], list names currently in scope"},
-    {true, "info", ":info <names>, describe named objects"},
-    {true, "browse", ":browse <modules>, browse names exported by <modules>"},
-    {true, "main", ":main <aruments>, run the main function with the given arguments"},
-    {true, "find", ":find <name>, edit module containing definition of name"},
-    {true, "cd", ":cd dir, change directory"},
-    {true, "version", ":version, print Hugs version"},
-    {true, "quit", ":quit, exit Hugs interpreter"},
-    {true, NULL, NULL}
+	Actions Code;
+    LPCTSTR Name;
+    LPCTSTR Help;
 };
 
-Action CmdUnknown = {false, "unknown", "Unknown command"};
-Action CmdEmpty = {false, "blank", "Type a command now"};
+ActionItem Commands[] =
+{
+    {actLoad, "load", ":load <filenames>, load modules from specified files"},
+    {actKnown, "also", ":also <filenames>, read additional modules"},
+    {actKnown, "reload", ":reload, repeat last load command"},
+    {actKnown, "edit", ":edit, <filename>, edit file"},
+    {actKnown, "module", ":module <module>, set module for evaluating expressions"},
+    {actKnown, "type", ":type <expr>, print type of expression"},
+    {actKnown, "?", ":?, display this list of commands"},
+    {actKnown, "set", ":set <options>, set command line options"},
+    {actKnown, "names", ":names [pat], list names currently in scope"},
+    {actKnown, "info", ":info <names>, describe named objects"},
+    {actKnown, "browse", ":browse <modules>, browse names exported by <modules>"},
+    {actKnown, "main", ":main <aruments>, run the main function with the given arguments"},
+    {actKnown, "find", ":find <name>, edit module containing definition of name"},
+    {actKnown, "cd", ":cd dir, change directory"},
+    {actKnown, "version", ":version, print Hugs version"},
+    {actKnown, "quit", ":quit, exit Hugs interpreter"},
+    {actUnknown, NULL, NULL}
+};
 
 bool IsEmpty(TCHAR c)
 {
     return (c == 0 || isspace(c));
 }
 
-Action* GetCommand(LPCTSTR Cmd)
+Action::~Action()
 {
+	free(Orig);
+	if (Command != NULL) free(Command);
+	if (Argument != NULL) free(Argument);
+}
+
+Action::Action(LPCTSTR Cmd)
+{
+	Orig = strdup(Cmd);
+
     LPCTSTR c = Cmd;
     while (isspace(*c))
         c++;
-    if (*c != ':')
-        return NULL;
+
+	if (c[0] == '!')
+	{
+		Command = NULL;
+		Argument = strdup(&c[1]);
+		Code = actShell;
+		Help = "Run the following shell command";
+		return;
+	}
+	else if (c[0] == 0)
+	{
+		Command = NULL;
+		Argument = NULL;
+		Code = actBlank;
+		Help = "Type an expression or a :command";
+		return;
+	}
+	else if (c[0] != ':')
+	{
+		Command = NULL;
+		Argument = strdup(c);
+		Code = actExpression;
+		Help = "Evaluate a Haskell expression";
+		return;
+	}
 
     int BestMatch = 0;
-    Action* BestCommand = (IsEmpty(c[1]) ? &CmdEmpty : &CmdUnknown);
+    ActionItem* BestCommand = NULL;
 
     for (int i = 0; Commands[i].Name != NULL; i++)
     {
@@ -59,13 +95,24 @@ Action* GetCommand(LPCTSTR Cmd)
             BestCommand = &Commands[i];
         }
     }
-    return BestCommand;
+
+	if (BestCommand == NULL)
+	{
+		Command = strdup(c);
+		Argument = NULL;
+		Code = actUnknown;
+		Help = "This command is unknown by WinHaskell";
+	}
+	else
+	{
+		Command = strdup(BestCommand->Name);
+		Argument = NULL;
+		Code = BestCommand->Code;
+		Help = BestCommand->Help;
+	}
 }
 
-LPCTSTR GetArgument(LPCTSTR Cmd)
-{
-    return NULL;
-}
+
 
 void CommandsCompletion(Completion* c)
 {

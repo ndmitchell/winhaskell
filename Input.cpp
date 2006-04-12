@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "History.h"
 #include "Lexer.h"
-#include "Commands.h"
+#include "Actions.h"
 #include "Completion.h"
 #include "Application.h"
 
@@ -118,45 +118,43 @@ void InputChanged(HWND hInput)
 
     //Now give command help if appropriate
     bool ShowComplete = false;
-    Action* c = GetCommand(Buffer);
-    if (c != NULL)
+	Action a(Buffer);
+
+	app->StatusBar(a.Help);
+
+	/*
+    int Pos = 0;
+    if (LexItems > 0 && Items[0].Lex == LexCommand &&
+        cr.cpMin >= Items[0].Start && cr.cpMax <= Items[0].End)
     {
-        SetStatusBar(c->Help);
+        ShowComplete = true;
 
-        int Pos = 0;
-        if (LexItems > 0 && Items[0].Lex == LexCommand &&
-            cr.cpMin >= Items[0].Start && cr.cpMax <= Items[0].End)
+        if (CompCommand == NULL)
         {
-            ShowComplete = true;
-
-            if (CompCommand == NULL)
-            {
-                CompCommand = new Completion(NULL);
-                CommandsCompletion(CompCommand);
-            }
-
-            RECT rc;
-            GetWindowRect(hInput, &rc);
-            POINT pt = {rc.left + (CharWidth * Items[0].Start), rc.top};
-
-            CompCommand->Move(pt);
-            if (ShowAutoComplete)
-                CompCommand->Show();
-
-            Buffer[Items[0].End] = 0;
-            CompCommand->SetCurrent(&Buffer[Items[0].Start]);
-            Active = CompCommand;
-            CompItem = Items[0];
+            CompCommand = new Completion(NULL);
+            CommandsCompletion(CompCommand);
         }
+
+        RECT rc;
+        GetWindowRect(hInput, &rc);
+        POINT pt = {rc.left + (CharWidth * Items[0].Start), rc.top};
+
+        CompCommand->Move(pt);
+        if (ShowAutoComplete)
+            CompCommand->Show();
+
+        Buffer[Items[0].End] = 0;
+        CompCommand->SetCurrent(&Buffer[Items[0].Start]);
+        Active = CompCommand;
+        CompItem = Items[0];
     }
-    else
-        SetStatusBar("Type an expression now");
 
     if (CompCommand != NULL && !ShowComplete)
     {
         CompCommand->Hide();
         Active = NULL;
     }
+	*/
 
     SendMessage(hInput, EM_EXSETSEL, 0, (LPARAM) &cr);
 }

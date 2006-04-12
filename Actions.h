@@ -1,13 +1,28 @@
 
 class Completion;
 
-struct Action
+enum Actions
 {
-    bool Real;
-    LPCTSTR Name;
-    LPCTSTR Help;
+	actUnknown,
+	actBlank,
+	actExpression,
+	actLoad,
+	actShell,
+	actKnown,
 };
 
-Action* GetCommand(LPCTSTR Cmd);
-LPCTSTR GetArgument(LPCTSTR Cmd);
+class Action
+{
+public:
+	Action(LPCTSTR Buffer);
+	~Action();
+
+	LPTSTR Orig;
+	LPTSTR Command;
+	LPTSTR Argument;
+
+	Actions Code;
+	LPCTSTR Help;
+};
+
 void CommandsCompletion(Completion* c);

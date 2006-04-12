@@ -24,6 +24,8 @@ public:
 	void AddTimer(Console* c, UINT Elapse);
 	void DelTimer(Console* c);
 
+	void StatusBar(LPCTSTR Text);
+
 //private:
 	Console* timeout;
 	UINT TimerId;
