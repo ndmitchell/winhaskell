@@ -6,59 +6,14 @@
 */
 #include "Header.h"
 #include "Output.h"
+#include "Console.h"
 #include "Application.h"
 
-#define MAXIMUM_BUFFER   100000
-
-HWND hRTF;
-
-struct Format
-{
-    int ForeColor;
-    int BackColor;
-    bool Bold;
-    bool Italic;
-    bool Underline;
-};
-
-bool FormatChanged = false;
-Format DefFormat = {0x000000, 0xFFFFFF, false, false, false};
-Format BufFormat;
-Format NowFormat;
-
-const int BufSize = 995;
-char Buf[1000];
-int BufPos = 0; // where to write out in the buffer
-int BufLen = 0; // how much of the buffer is useful
-int OutputPos = 0; // how much to delete of the existing thing
-bool IsTimer = false;
-
-// buffer to hold an escape character
-bool InEscBuf = false;
-const int EscBufSize = 100;
-char EscBuf[100];
-int EscBufPos = 0;
-
-DWORD Length = 0;
-DWORD OutputStart;
-
-HANDLE hMutex;
+const int OutputBufferSize = 100000;
 
 
-void EnsureTimer()
-{
-    if (!IsTimer) {
-		IsTimer = TRUE;
-		SetTimer(GetParent(hRTF), 666, 100, NULL);
-    }
-}
 
-void DestTimer()
-{
-    KillTimer(GetParent(hRTF), 666);
-    IsTimer = FALSE;
-}
-
+/*
 
 int RtfWindowTextLength()
 {
@@ -237,34 +192,6 @@ void AddToBuffer(LPCTSTR s)
     EnsureTimer();
 }
 
-void OutputTimer()
-{
-    // if you are doing useful work, why die?
-    if (BufLen == 0)
-	DestTimer();
-    FlushBuffer(FALSE);
-}
-
-void RtfWindowPutS(LPCTSTR s)
-{
-    AddToBuffer(s);
-}
-
-void RtfEchoCommand(LPCTSTR s)
-{
-    RtfWindowPutS(s);
-    RtfWindowPutS("\n");
-}
-
-void RtfWindowStartOutput()
-{
-    RtfWindowPutS("\n");
-    RtfWindowFlushBuffer();
-    BufFormat = DefFormat;
-    NowFormat = DefFormat;
-    OutputStart = RtfWindowTextLength();
-}
-
 void RtfWindowStartInput()
 {
     CHARRANGE cr;
@@ -371,7 +298,7 @@ void OutputCopy(HWND hCopy)
         SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Buf2);
     }
 }
-
+*/
 
 // Output class
 
@@ -383,7 +310,7 @@ INT_PTR CALLBACK OutputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
-            MoveWindow(hRTF, 0, 0, rc.right, rc.bottom, TRUE);
+			MoveWindow(output->hRTF, 0, 0, rc.right, rc.bottom, TRUE);
         }
         break;
     }
@@ -392,10 +319,18 @@ INT_PTR CALLBACK OutputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 Output::Output(HWND hParent)
 {
+	Length = 0;
     hWnd = CreateDialog(hInst, MAKEINTRESOURCE(CTL_OUTPUT), hParent, OutputDialogProc);
     hRTF = GetDlgItem(hWnd, rtfOutput);
-    ::hRTF = hRTF;
-    OutputInit(hRTF);
+
+    SendMessage(hRTF, EM_LIMITTEXT, 1000000, 0);
+
+	CHARFORMAT cf;
+    cf.cbSize = sizeof(CHARFORMAT);
+    cf.dwMask = CFM_FACE | CFM_SIZE | CFM_COLOR;
+	strcpy(cf.szFaceName, "Courier New");
+	cf.yHeight = 200;
+    SendMessage(hRTF, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
 }
 
 Output::~Output()
@@ -404,17 +339,131 @@ Output::~Output()
 
 void Output::Append(LPCTSTR Text)
 {
-    OutputAppend(Text);
-	FlushBuffer(TRUE);
+	SelEnd();
+	SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Text);
 
+	/*
+
+    Length = RtfWindowTextLength();
+    if (Length > MAXIMUM_BUFFER) {
+	LPCSTR Blank = "";
+	CHARRANGE cr;
+
+	SendMessage(hRTF, EM_HIDESELECTION, TRUE, 0);
+
+	cr.cpMin = 0;
+	cr.cpMax = (Length - MAXIMUM_BUFFER) + (MAXIMUM_BUFFER / 4);
+	SendMessage(hRTF, EM_EXSETSEL, 0, (LPARAM) &cr);
+
+	SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Blank);
+
+	cr.cpMin = -1;
+	cr.cpMax = -1;
+	SendMessage(hRTF, EM_EXSETSEL, 0, (LPARAM) &cr);
+
+	SendMessage(hRTF, EM_HIDESELECTION, FALSE, 0);
+
+	Length = RtfWindowTextLength();
+    }*/
+}
+
+void Output::SelEnd()
+{
+	SendMessage(hRTF, EM_SETSEL, -1, -1);
+}
+
+void Output::SetCharFormat(CHARFORMAT* cf, DWORD Mask)
+{
+	cf->cbSize = sizeof(CHARFORMAT);
+	cf->dwMask = Mask;
+	SelEnd();
+	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) cf);
 }
 
 void Output::SetBold(bool Bold)
 {
-    OutputBold(Bold);
+	CHARFORMAT cf;
+	cf.dwEffects = (Bold ? CFE_BOLD : 0);
+	SetCharFormat(&cf, CFM_BOLD);
 }
 
-void Output::SetColor(int Color)
+void Output::SetUnderline(bool Underline)
 {
-    OutputColor(Color);
+	CHARFORMAT cf;
+	cf.dwEffects = (Underline ? CFE_UNDERLINE : 0);
+	SetCharFormat(&cf, CFM_UNDERLINE);
+}
+
+void Output::SetForecolor(int Color)
+{
+	CHARFORMAT cf;
+	cf.dwEffects = 0;
+	cf.crTextColor = Color;
+	SetCharFormat(&cf, CFM_COLOR);
+}
+
+void Output::SetBackcolor(int Color)
+{
+	CHARFORMAT2 cf2;
+	cf2.cbSize = sizeof(cf2);
+	cf2.dwMask = CFM_BACKCOLOR;
+	cf2.dwEffects = 0;
+	cf2.crBackColor = Color;
+	SelEnd();
+	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
+}
+
+void Output::Escape(ConsoleEscape Code)
+{
+    int AnsiColor[8] = {
+		BLACK, RED, GREEN, YELLOW, BLUE,
+		MAGENTA, CYAN, WHITE};
+
+	if (Code == conBold)
+		SetBold(true);
+	else if (Code == conUnderline)
+		SetUnderline(true);
+	else if (Code >= conForeground && Code <= conForeground+8)
+		SetForecolor(AnsiColor[Code-conForeground]);
+	else if (Code >= conBackground && Code <= conBackground+8)
+		SetBackcolor(AnsiColor[Code-conBackground]);
+	else if (Code == conReset)
+		FormatReset();
+	else if (Code == conBackspace)
+		Rewind();
+}
+
+void Output::FormatReset()
+{
+	OutputFormat of;
+	of.ForeColor = BLACK;
+	of.BackColor = WHITE;
+	of.Bold = false;
+	of.Underline = false;
+	FormatSet(&of);
+}
+
+void Output::FormatSet(OutputFormat* of)
+{
+	CHARFORMAT2 cf2;
+	cf2.cbSize = sizeof(cf2);
+	cf2.dwEffects = (of->Bold ? CFE_BOLD : 0) | (of->Underline ? CFE_UNDERLINE : 0);
+	cf2.dwMask = CFM_BOLD | CFM_UNDERLINE | CFM_COLOR | CFM_BACKCOLOR;
+	cf2.crBackColor = of->BackColor;
+	cf2.crTextColor = of->ForeColor;
+	SelEnd();
+	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
+}
+
+void Output::FormatGet(OutputFormat* of)
+{
+	CHARFORMAT2 cf2;
+	cf2.cbSize = sizeof(cf2);
+	cf2.dwMask = CFM_BOLD | CFM_UNDERLINE | CFM_COLOR | CFM_BACKCOLOR;
+	SelEnd();
+	SendMessage(hRTF, EM_GETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
+	of->ForeColor = cf2.crTextColor;
+	of->BackColor = cf2.crBackColor;
+	of->Bold = (cf2.dwEffects & CFM_BOLD ? true : false);
+	of->Underline = (cf2.dwEffects & CFM_UNDERLINE ? true : false);
 }

@@ -34,7 +34,7 @@ void Application::FireCommand(Command c, int Param)
     case cmdRun:
         TCHAR Buffer[500];
         input->Get(Buffer);
-        output->SetColor(BLACK);
+		output->FormatReset();
         output->Append(Buffer);
         output->Append("\n");
         input->SelAll();
@@ -165,9 +165,9 @@ void MainDialogInit()
 
 	SendMessage(G_hWnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIcon(hInst, MAKEINTRESOURCE(1)));
 
-    output->SetColor(GREEN);
+    output->SetForecolor(GREEN);
     output->Append("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
-    output->SetColor(BLACK);
+    output->SetForecolor(BLACK);
 
 
 	//Wrap = WrapperInit();
@@ -325,8 +325,8 @@ void MainDialogDropFiles(HDROP hDrop)
 
 VOID CALLBACK TimerFunc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	app->timeout->Tick();
-	KillTimer(NULL, idEvent);
+	if (app->timeout->Tick())
+		KillTimer(NULL, idEvent);
 }
 
 
@@ -355,12 +355,8 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	    return MainDialogNotify((LPNMHDR) lParam);
 	    break;
 
-	case WM_TIMER:
-	    OutputTimer();
-	    break;
-
 	case WM_USER:
-		SetTimer(NULL, 0, wParam, TimerFunc);
+		app->TimerId = SetTimer(NULL, 0, (UINT) wParam, TimerFunc);
 		break;
 
 	case WM_CLOSE:

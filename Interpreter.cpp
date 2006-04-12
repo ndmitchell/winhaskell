@@ -35,8 +35,8 @@ void Interpreter::Escape(ConsoleEscape Code, bool Stdout)
 		Initialised = true;
 	else if (Code == conComplete)
 		app->ExecutionComplete();
-	else
-		; //do nothing
+	else if (Stdout)
+		output->Escape(Code);
 }
 
 void Interpreter::Finished()

@@ -21,6 +21,7 @@ public:
 
 //private:
 	Console* timeout;
+	UINT TimerId;
     HWND hWnd;
 
     HWND hStatus;

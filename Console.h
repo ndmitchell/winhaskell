@@ -60,14 +60,18 @@ public:
     void Exception();
 
 	//Called by the app to denote that the timer has completed
-	void Tick();
+	bool Tick();
 
     //Should be private, but because of marshalling is not
     void Internal_ReadHandle(bool Stdout);
 
 private:
+	//Lock
+	HANDLE hSemaphore;
+	void BeginLock();
+	void EndLock();
+
 	//Buffer
-	HANDLE hMutex;
 	bool BufStdout;
 	TCHAR Buffer[ConsoleBufferSize+1];
 	DWORD BufSize;

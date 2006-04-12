@@ -51,7 +51,7 @@ DWORD WINAPI ConsoleReadStdErr(LPVOID Param)
 
 Console::Console()
 {
-	hMutex = CreateMutex(NULL, FALSE, NULL);
+	hSemaphore = CreateSemaphore(NULL, 1, 1, NULL);
 	BufSize = 0;
     ConsoleInit();
     Running = false;
@@ -59,7 +59,7 @@ Console::Console()
 
 Console::~Console()
 {
-	CloseHandle(hMutex);
+	CloseHandle(hSemaphore);
     if (Running)
         Abort();
 }
@@ -79,7 +79,7 @@ void Console::Start(LPCTSTR Command)
 	si.cb = sizeof(STARTUPINFO); 
 	si.hStdInput = tStdin;
 	si.hStdOutput = tStdout;
-	si.hStdError = tStderr;
+	si.hStdError = tStdout; // Was previously stderr
 	si.dwFlags = STARTF_USESTDHANDLES;
     
     LPSTR Command2 = strdup(Command);
@@ -99,7 +99,7 @@ void Console::Start(LPCTSTR Command)
 	
 	DWORD dword;
     CreateThread(NULL, 0, ConsoleReadStdOut, this, 0, &dword);
-	CreateThread(NULL, 0, ConsoleReadStdErr, this, 0, &dword);
+	//CreateThread(NULL, 0, ConsoleReadStdErr, this, 0, &dword);
 }
 
 void Console::Exception()
@@ -128,11 +128,26 @@ void Console::FlushBuffer()
 	}
 }
 
-void Console::Tick()
+void Console::BeginLock()
 {
-	WaitForSingleObject(hMutex, INFINITE);
-	FlushBuffer();
-	ReleaseMutex(hMutex);
+	WaitForSingleObject(hSemaphore, INFINITE);
+}
+
+void Console::EndLock()
+{
+	ReleaseSemaphore(hSemaphore, 1, NULL); 
+}
+
+bool Console::Tick()
+{
+	if (WaitForSingleObject(hSemaphore, 0) == WAIT_TIMEOUT)
+		return false;
+	else
+	{
+		FlushBuffer();
+		EndLock();
+		return true;
+	}
 }
 
 void Console::ProcessEscape()
@@ -205,7 +220,7 @@ void Console::Internal_ReadHandle(bool Stdout)
 		if(!ReadFile(h, chBuf, 1, &dword,  NULL) || dword == 0)
 			break;
 
-		WaitForSingleObject(hMutex, INFINITE);
+		BeginLock();
 
 		if (chBuf[0] == '\b')
 		{
@@ -232,7 +247,7 @@ void Console::Internal_ReadHandle(bool Stdout)
 				app->AddTimer(this, ConsoleTimeout);
 		}
 
-		ReleaseMutex(hMutex);
+		EndLock();
 	} 
 }
 
