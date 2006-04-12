@@ -196,8 +196,8 @@ BOOL InputNotify(HWND hWnd, LPNMHDR nmhdr)
                 int Dir = (mf->wParam == VK_UP ? -1 : +1);
                 if (Active == NULL)
                 {
-                    SetWindowText(nmhdr->hwndFrom, app->history->Get(Dir));
-                    app->input->SelAll();
+                    SetWindowText(nmhdr->hwndFrom, history->Get(Dir));
+                    input->SelAll();
                 }
                 else
                     Active->SetCurrentDelta(Dir);

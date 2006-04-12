@@ -1,17 +1,4 @@
 
-class Application;
-class Toolbar;
-class Interpreter;
-class Compiler;
-class Input;
-class Output;
-class RecentFiles;
-class History;
-
-enum Command;
-
-extern Application* app;
-
 
 // The main application for WinHaskell
 class Application
@@ -25,14 +12,6 @@ public:
     void DefaultCommand();
 
     void ExecutionComplete();
-
-    Toolbar* toolbar;
-    Interpreter* interpreter;
-    Compiler* compiler;
-    Input* input;
-    Output* output;
-    RecentFiles* recentFiles;
-    History* history;
 
 //private:
     HWND hWnd;

@@ -68,3 +68,25 @@ void ExecutionComplete();
 
 void Execute(LPCTSTR Command);
 
+
+
+class Application;
+class Toolbar;
+class Interpreter;
+class Compiler;
+class Input;
+class Output;
+class RecentFiles;
+class History;
+
+enum Command;
+
+extern Application* app;
+extern Toolbar* toolbar;
+extern Interpreter* interpreter;
+extern Compiler* compiler;
+extern Input* input;
+extern Output* output;
+extern RecentFiles* recentFiles;
+extern History* history;
+

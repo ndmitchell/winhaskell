@@ -4,6 +4,15 @@
 // Shared variables
 HINSTANCE hInst;
 
+Application* app;
+Toolbar* toolbar;
+Interpreter* interpreter;
+Compiler* compiler;
+Input* input;
+Output* output;
+RecentFiles* recentFiles;
+History* history;
+
 
 INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow)
 {

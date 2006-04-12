@@ -32,13 +32,13 @@ void Interpreter::Read(LPTSTR Buffer, DWORD Size, bool Stdout)
             if (Buffer[i] == '\001')
             {
                 Initialised = true;
-                app->output->Append(&Buffer[i+1]);
+                output->Append(&Buffer[i+1]);
                 break;
             }
         }
     }
     else
-        app->output->Append(Buffer);
+        output->Append(Buffer);
 }
 
 void Interpreter::Finished()

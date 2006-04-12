@@ -13,7 +13,6 @@
 #include "Command.h"
 
 
-Application* app;
 
 void ShowMainDialog();
 
@@ -87,8 +86,8 @@ void MainDialogResize()
 	GetClientRect(G_hWnd, &rcWnd);
 	Height = rcWnd.bottom;
 
-    int ToolbarHeight = app->toolbar->Height();
-    MoveWindow(app->toolbar->hWnd, 0, 0, rcWnd.right, ToolbarHeight, TRUE);
+    int ToolbarHeight = toolbar->Height();
+    MoveWindow(toolbar->hWnd, 0, 0, rcWnd.right, ToolbarHeight, TRUE);
 
     GetClientRect(app->hStatus, &rc);
     MoveWindow(app->hStatus, 0, Height - rc.bottom,
@@ -96,13 +95,13 @@ void MainDialogResize()
 	Height -= rc.bottom + 3;
 
 	int txtHeight = (false ? 100 : 24);
-	MoveWindow(app->input->hWnd, 0, Height - txtHeight,
+	MoveWindow(input->hWnd, 0, Height - txtHeight,
 		rcWnd.right, txtHeight, TRUE);
 	//MoveWindow(GetDlgItem(G_hWnd, ID_EXPAND), rcWnd.right - 25,
 	//	Height - 25 + 5, 25, 25, TRUE);
 	Height -= txtHeight + 3;
 
-    MoveWindow(app->output->hWnd, 0, ToolbarHeight,
+    MoveWindow(output->hWnd, 0, ToolbarHeight,
 		rcWnd.right, Height - ToolbarHeight, TRUE);
 }
 
@@ -142,9 +141,9 @@ void MainDialogInit()
     HWND G_hWnd = app->hWnd;
 //    RegistryReadWindowPos(G_hWnd);
 
-    app->toolbar = new Toolbar(app->hWnd);
-    app->input = new Input(app->hWnd);
-    app->output = new Output(app->hWnd);
+    toolbar = new Toolbar(app->hWnd);
+    input = new Input(app->hWnd);
+    output = new Output(app->hWnd);
 
 
     //RecentFilesInit();
@@ -154,9 +153,9 @@ void MainDialogInit()
 
 	SendMessage(G_hWnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIcon(hInst, MAKEINTRESOURCE(1)));
 
-    app->output->SetColor(GREEN);
-    app->output->Append("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
-    app->output->SetColor(BLACK);
+    output->SetColor(GREEN);
+    output->Append("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
+    output->SetColor(BLACK);
 
 
 	//Wrap = WrapperInit();

@@ -118,7 +118,6 @@ Toolbar::Toolbar(HWND hParent)
 {
     hWnd = CreateDialog(hInst, MAKEINTRESOURCE(CTL_TOOLBAR), hParent, ToolbarDialogProc);
     hTab = GetDlgItem(hWnd, TAB_LIST);
-    SetWindowLongPtr(hWnd, DWL_USER, (LONG) this);
 
 	hNormalIml = ImageList_Create(32, 32, ILC_COLOR24 | ILC_MASK, 0, 0);
 	HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(BMP_TOOLBAR));
@@ -165,7 +164,7 @@ Command Toolbar::DefaultCommand()
         return cmdRun;
 }
 
-void ToolbarResize(Toolbar* toolbar)
+void ToolbarResize()
 {
     RECT rc;
     GetClientRect(toolbar->hWnd, &rc);
@@ -175,13 +174,13 @@ void ToolbarResize(Toolbar* toolbar)
     MoveWindow(toolbar->Tabs[i].hToolbar, 5, 25, rc.right - 20, 42, TRUE);
 }
 
-BOOL ToolbarNotify(Toolbar* toolbar, LPNMHDR nmhdr)
+BOOL ToolbarNotify(LPNMHDR nmhdr)
 {
     if (nmhdr->code == TCN_SELCHANGE || nmhdr->code == TCN_SELCHANGING)
     {
         int i = TabCtrl_GetCurSel(nmhdr->hwndFrom);
         ShowWindow(toolbar->Tabs[i].hToolbar, (nmhdr->code == TCN_SELCHANGE ? SW_SHOW : SW_HIDE));
-        ToolbarResize(toolbar);
+        ToolbarResize();
     }
     else if (nmhdr->code == TBN_DROPDOWN)
     {
@@ -242,7 +241,7 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     switch(uMsg)
     {
     case WM_NOTIFY:
-        return ToolbarNotify((Toolbar*) GetWindowLong(hWnd, DWL_USER), (LPNMHDR) lParam);
+        return ToolbarNotify((LPNMHDR) lParam);
         break;
 
     case WM_COMMAND:
@@ -250,7 +249,7 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         break;
 
     case WM_SIZE:
-        ToolbarResize((Toolbar*) GetWindowLong(hWnd, DWL_USER));
+        ToolbarResize();
         break;
     }
     return FALSE;
