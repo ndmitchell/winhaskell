@@ -20,6 +20,10 @@ public:
     //void Rewind();
 
 // private:
+
+	void AppendRaw(LPCTSTR Text);
+	void AppendEsc(LPCTSTR Text);
+
     HWND hWnd;
     HWND hRTF;
 };

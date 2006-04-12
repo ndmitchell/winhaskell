@@ -15,7 +15,7 @@ public:
 
 private:
 
-    virtual void Read(LPTSTR Buffer, DWORD Size, bool Stdout);
+    virtual void Read(LPCTSTR Buffer, DWORD Size, bool Stdout);
     virtual void Finished();
 
     bool Initialised;

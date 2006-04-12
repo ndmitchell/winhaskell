@@ -216,7 +216,7 @@ BOOL ToolbarNotify(LPNMHDR nmhdr)
     else if (nmhdr->code == NM_CLICK)
     {
         DWORD Pos = GetMessagePos();
-        int Hot = SendMessage(nmhdr->hwndFrom, TB_GETHOTITEM, 0, 0);
+        LRESULT Hot = SendMessage(nmhdr->hwndFrom, TB_GETHOTITEM, 0, 0);
         if (Hot != -1)
         {
             TBBUTTONINFO tbi;

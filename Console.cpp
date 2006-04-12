@@ -1,5 +1,6 @@
 #include "Header.h"
 #include "Console.h"
+#include "Application.h"
 
 HANDLE CreateStreamConsole(bool Write, HANDLE* hUseless);
 
@@ -50,12 +51,15 @@ DWORD WINAPI ConsoleReadStdErr(LPVOID Param)
 
 Console::Console()
 {
+	hMutex = CreateMutex(NULL, FALSE, NULL);
+	BufSize = 0;
     ConsoleInit();
     Running = false;
 }
 
 Console::~Console()
 {
+	CloseHandle(hMutex);
     if (Running)
         Abort();
 }
@@ -114,6 +118,22 @@ void Console::Write(LPCTSTR Buffer, DWORD Size)
     assert(dword == Size);
 }
 
+void Console::FlushBuffer()
+{
+	if (BufSize != 0)
+	{
+		Buffer[BufSize] = 0;
+		Read(Buffer, BufSize, BufStdout);
+		BufSize = 0;
+	}
+}
+
+void Console::Tick()
+{
+	WaitForSingleObject(hMutex, INFINITE);
+	FlushBuffer();
+	ReleaseMutex(hMutex);
+}
 
 void Console::Internal_ReadHandle(bool Stdout)
 {
@@ -126,7 +146,23 @@ void Console::Internal_ReadHandle(bool Stdout)
 		if(!ReadFile(h, chBuf, 1, &dword,  NULL) || dword == 0)
 			break;
 
-        Read(chBuf, 1, Stdout);
+		WaitForSingleObject(hMutex, INFINITE);
+
+		if ((BufSize != 0 && Stdout != BufStdout) ||
+			(BufSize >= ConsoleBufferSize) ||
+			(BufSize != 0 && chBuf[0] == ConsoleEscape))
+		{
+			app->DelTimer(this);
+			FlushBuffer();
+		}
+		bool AddTimer = (BufSize == 0);
+		BufStdout = Stdout;
+		Buffer[BufSize++] = chBuf[0];
+
+		if (AddTimer)
+			app->AddTimer(this, ConsoleTimeout);
+
+		ReleaseMutex(hMutex);
 	} 
 }
 

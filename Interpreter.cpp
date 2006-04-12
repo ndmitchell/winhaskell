@@ -23,7 +23,7 @@ void Interpreter::Begin(LPCTSTR Command)
     Evaluate("putChar '\\001'");
 }
 
-void Interpreter::Read(LPTSTR Buffer, DWORD Size, bool Stdout)
+void Interpreter::Read(LPCTSTR Buffer, DWORD Size, bool Stdout)
 {
     if (!Initialised)
     {

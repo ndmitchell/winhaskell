@@ -70,6 +70,17 @@ void Application::ExecutionComplete()
     toolbar->RunningChanged(false);
 }
 
+void Application::AddTimer(Console* c, UINT Elapse)
+{
+	timeout = c;
+	PostMessage(hWnd, WM_USER, Elapse, (LPARAM) c);
+}
+
+void Application::DelTimer(Console* c)
+{
+	KillTimer(NULL, (UINT) c);
+}
+
 void SetStatusBar(LPCTSTR Text)
 {
     SetDlgItemText(app->hWnd, ID_STATUS, Text);
@@ -311,6 +322,13 @@ void MainDialogDropFiles(HDROP hDrop)
     */
 }
 
+VOID CALLBACK TimerFunc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+	app->timeout->Tick();
+	KillTimer(NULL, idEvent);
+}
+
+
 INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -339,6 +357,10 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_TIMER:
 	    OutputTimer();
 	    break;
+
+	case WM_USER:
+		SetTimer(NULL, 0, wParam, TimerFunc);
+		break;
 
 	case WM_CLOSE:
         //RegistryWriteWindowPos(hWnd);
