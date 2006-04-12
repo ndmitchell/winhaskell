@@ -27,39 +27,6 @@ Application::Application()
     interpreter = (Interpreter*) StartHugs();
 }
 
-void Application::FireCommand(Command c, int Param)
-{
-    switch (c)
-    {
-    case cmdRun:
-        TCHAR Buffer[500];
-        input->Get(Buffer);
-		output->FormatReset();
-        output->Append(Buffer);
-        output->Append("\n");
-        input->SelAll();
-        history->Add(Buffer);
-        interpreter->Evaluate(Buffer);
-        toolbar->RunningChanged(true);
-        break;
-
-    case cmdStop:
-        interpreter->AbortComputation();
-        break;
-
-    default:
-        output->Append("Command not handled, give me mon\xffy to implement this\n");
-    }
-}
-
-HMENU Application::QueryCommand(Command c)
-{
-    if (c == cmdRecent)
-        return recentFiles->GetMenu();
-    else
-        return NULL;
-}
-
 void Application::DefaultCommand()
 {
     FireCommand(toolbar->DefaultCommand(), 0);
@@ -168,10 +135,6 @@ void MainDialogInit()
     output->SetForecolor(GREEN);
     output->Append("-- Welcome to WinHaskell, (C) Neil Mitchell 2005-2006\n");
     output->SetForecolor(BLACK);
-
-
-	//Wrap = WrapperInit();
-   // StartHugs();
 }
 
 void FireCommand()

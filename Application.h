@@ -12,6 +12,11 @@ public:
     HMENU QueryCommand(Command c);
     void DefaultCommand();
 
+	void LoadFile(LPCTSTR File);
+
+	void CommandRun();
+	void CommandOpen();
+
     void ExecutionComplete();
 
 	//Timer, for console only

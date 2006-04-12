@@ -118,7 +118,7 @@
 				RelativePath=".\Application.cpp">
 			</File>
 			<File
-				RelativePath=".\Commands.cpp">
+				RelativePath=".\Command.cpp">
 			</File>
 			<File
 				RelativePath=".\Completion.cpp">
@@ -230,13 +230,16 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\Actions.cpp">
+			</File>
+			<File
+				RelativePath=".\Actions.h">
+			</File>
+			<File
 				RelativePath=".\Application.h">
 			</File>
 			<File
 				RelativePath=".\Command.h">
-			</File>
-			<File
-				RelativePath=".\Commands.h">
 			</File>
 			<File
 				RelativePath=".\Completion.h">
