@@ -31,13 +31,17 @@ void Application::CommandRun()
 	
 	switch (a.Code)
 	{
-	case actUnknown: case actBlank:
+	case actUnknown: case actBlank: case actShell:
 		Warning("I don't know how to execute this command...");
 		return;
 
 	case actExpression:
 		interpreter->Evaluate(Buffer);
 		break;
+
+	case actQuit:
+		SendMessage(app->hWnd, WM_CLOSE, 0, 0);
+		return;
 
 	default:
 		if (!interpreter->Execute(&a))

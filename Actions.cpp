@@ -26,7 +26,7 @@ ActionItem Commands[] =
     {actKnown, "find", ":find <name>, edit module containing definition of name"},
     {actKnown, "cd", ":cd dir, change directory"},
     {actKnown, "version", ":version, print Hugs version"},
-    {actKnown, "quit", ":quit, exit Hugs interpreter"},
+    {actQuit, "quit", ":quit, exit Hugs interpreter"},
     {actUnknown, NULL, NULL}
 };
 
