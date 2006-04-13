@@ -23,6 +23,9 @@ public:
 
 	Actions Code;
 	LPCTSTR Help;
+
+private:
+	void PickBestAction();
 };
 
 void CommandsCompletion(Completion* c);

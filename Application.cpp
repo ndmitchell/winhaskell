@@ -32,9 +32,20 @@ void Application::DefaultCommand()
     FireCommand(toolbar->DefaultCommand(), 0);
 }
 
-void Application::ExecutionComplete()
+void Application::RunningChanged(bool Running)
 {
-    toolbar->RunningChanged(false);
+    toolbar->RunningChanged(Running);
+}
+
+void Application::Warning(LPCTSTR Text)
+{
+	OutputFormat of;
+	output->FormatGet(&of);
+	output->SetForecolor(RED);
+	output->Append("\nWarning: ");
+	output->Append(Text);
+	output->Append("\n");
+	output->FormatSet(&of);
 }
 
 void Application::AddTimer(Console* c, UINT Elapse)

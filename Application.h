@@ -14,10 +14,11 @@ public:
 
 	void LoadFile(LPCTSTR File);
 
+	void CommandRun(LPCTSTR File);
 	void CommandRun();
 	void CommandOpen();
 
-    void ExecutionComplete();
+    void RunningChanged(bool Running);
 
 	//Timer, for console only
 	//Bug: Should support many consoles, currently supports only one
@@ -25,6 +26,7 @@ public:
 	void DelTimer(Console* c);
 
 	void StatusBar(LPCTSTR Text);
+	void Warning(LPCTSTR Text);
 
 //private:
 	Console* timeout;

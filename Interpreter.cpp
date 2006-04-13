@@ -1,6 +1,8 @@
 #include "Header.h"
 #include "Console.h"
 #include "Interpreter.h"
+#include "Actions.h"
+#include "RecentFiles.h"
 
 #include "Output.h"
 #include "Application.h"
@@ -34,7 +36,7 @@ void Interpreter::Escape(ConsoleEscape Code, bool Stdout)
 	if (!Initialised && Code == conBackspace)
 		Initialised = true;
 	else if (Code == conComplete)
-		app->ExecutionComplete();
+		app->RunningChanged(false);
 	else if (Stdout)
 		output->Escape(Code);
 }
@@ -54,4 +56,36 @@ void Interpreter::Evaluate(LPCTSTR Line)
     Write("\n", 1);
 }
 
+bool Interpreter::Execute(Action* a)
+{
+	TCHAR Buffer[500];
 
+	switch (a->Code)
+	{
+	case actLoad:
+		{
+			int n = 6;
+			strcpy(Buffer, ":load ");
+			for (int i = 0; a->Argument[i] != 0; i++)
+			{
+				if (a->Argument[i] == '\\')
+				{
+					Buffer[n++] = '\\';
+					Buffer[n++] = '\\';
+				}
+				else
+					Buffer[n++] = a->Argument[i];
+			}
+			Buffer[n] = 0;
+			recentFiles->Add(a->Argument);
+		}
+		break;
+
+	default:
+		wsprintf(Buffer, ":%s %s", a->Command, a->Argument);
+		break;
+	}
+
+	Evaluate(Buffer);
+	return true;
+}

@@ -1,4 +1,6 @@
 
+class Action;
+
 class Interpreter: private Console
 {
 public:
@@ -6,12 +8,15 @@ public:
     ~Interpreter(){Abort();};
 
     void Begin(LPCTSTR Command);
-    void Evaluate(LPCTSTR Line);
     void AbortComputation();
 
 
     // events provided by the child
     virtual void SetPrompt(LPCTSTR Prompt) = 0;
+
+	void Evaluate(LPCTSTR Expression);
+	//return false is execution could not be started
+	bool Execute(Action* a);
 
 private:
 

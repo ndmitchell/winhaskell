@@ -56,7 +56,6 @@ Action::Action(LPCTSTR Cmd)
 		Argument = strdup(&c[1]);
 		Code = actShell;
 		Help = "Run the following shell command";
-		return;
 	}
 	else if (c[0] == 0)
 	{
@@ -64,7 +63,6 @@ Action::Action(LPCTSTR Cmd)
 		Argument = NULL;
 		Code = actBlank;
 		Help = "Type an expression or a :command";
-		return;
 	}
 	else if (c[0] != ':')
 	{
@@ -72,9 +70,29 @@ Action::Action(LPCTSTR Cmd)
 		Argument = strdup(c);
 		Code = actExpression;
 		Help = "Evaluate a Haskell expression";
-		return;
 	}
+	else
+	{
+		Command = strdup(c);
+		LPTSTR d;
+		for (d = Command; *d != 0 && !isspace(*d); d++)
+			; //no code required
+		if (*d == 0)
+			Argument = NULL;
+		else
+		{
+			d[0] = 0;
+			d++;
+			while(isspace(*d))
+				d++;
+			Argument = strdup(d);
+		}
+		PickBestAction();
+	}
+}
 
+void Action::PickBestAction()
+{
     int BestMatch = 0;
     ActionItem* BestCommand = NULL;
 
@@ -83,13 +101,13 @@ Action::Action(LPCTSTR Cmd)
         int Match;
         for (Match = 0;
             Commands[i].Name[Match] != 0 &&
-            tolower(Commands[i].Name[Match]) == tolower(c[Match+1]);
+            tolower(Commands[i].Name[Match]) == tolower(Command[Match+1]);
             Match++)
         {
             ; // Nothing
         }
 
-        if (IsEmpty(c[Match+1]) && (Match > BestMatch))
+        if (IsEmpty(Command[Match+1]) && (Match > BestMatch))
         {
             BestMatch = Match;
             BestCommand = &Commands[i];
@@ -98,20 +116,17 @@ Action::Action(LPCTSTR Cmd)
 
 	if (BestCommand == NULL)
 	{
-		Command = strdup(c);
-		Argument = NULL;
 		Code = actUnknown;
 		Help = "This command is unknown by WinHaskell";
 	}
 	else
 	{
+		if (Command != NULL) free(Command);
 		Command = strdup(BestCommand->Name);
-		Argument = NULL;
 		Code = BestCommand->Code;
 		Help = BestCommand->Help;
 	}
 }
-
 
 
 void CommandsCompletion(Completion* c)

@@ -8,27 +8,50 @@
 #include "Toolbar.h"
 #include "Command.h"
 #include "RecentFiles.h"
+#include "Actions.h"
 
+void Application::CommandRun(LPCTSTR Command)
+{
+	input->Set(Command);
+	CommandRun();
+}
 
 void Application::CommandRun()
 {
     TCHAR Buffer[500];
     input->Get(Buffer);
+	input->SelAll();
+
 	output->FormatReset();
     output->Append(Buffer);
     output->Append("\n");
-    input->SelAll();
     history->Add(Buffer);
-    interpreter->Evaluate(Buffer);
-    toolbar->RunningChanged(true);
+
+	Action a(Buffer);
+	
+	switch (a.Code)
+	{
+	case actUnknown: case actBlank:
+		Warning("I don't know how to execute this command...");
+		return;
+
+	case actExpression:
+		interpreter->Evaluate(Buffer);
+		break;
+
+	default:
+		if (!interpreter->Execute(&a))
+			return;
+	}
+
+    app->RunningChanged(true);
 }
 
 void Application::LoadFile(LPCTSTR File)
 {
 	TCHAR Buffer[MAX_PATH+100];
 	wsprintf(Buffer, ":load \"%s\"", File);
-	input->Set(Buffer);
-	CommandRun();
+	CommandRun(Buffer);
 }
 
 void Application::CommandOpen()
@@ -72,11 +95,7 @@ void Application::FireCommand(Command c, int Param)
 		break;
 
     default:
-		OutputFormat of;
-		output->FormatGet(&of);
-		output->SetForecolor(RED);
-		output->Append("\nWarning: Command not handled, give me mon£y to implement this\n");
-		output->FormatSet(&of);
+		Warning("Command not handled, give me mon£y to implement this");
     }
 }
 
