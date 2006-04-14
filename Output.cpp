@@ -8,6 +8,7 @@
 #include "Output.h"
 #include "Console.h"
 #include "Application.h"
+#include "Lexer.h"
 
 const int OutputBufferSize = 100000;
 
@@ -335,6 +336,49 @@ Output::Output(HWND hParent)
 
 Output::~Output()
 {
+}
+
+void Output::AppendLex(LPCTSTR Text)
+{
+    LPTSTR Text_unsafe = (LPTSTR) Text;
+
+    SelEnd();
+    LexItem Items[250];
+    int LexItems = GetLexemes(Text, Items, 250);
+
+    int LastEnd = 0;
+    for (int i = 0; i < LexItems; i++)
+    {
+        switch (Items[i].Lex)
+        {
+        case LexKeyword:
+            SetForecolor(BLUE);
+            break;
+
+        case LexOperator:
+            SetForecolor(RED);
+            break;
+
+        case LexString:
+            SetForecolor(CYAN);
+            break;
+
+        default:
+            SetForecolor(BLACK);
+        }
+        if (Items[i].Lex == LexCommand)
+            SetBold(true);
+
+        char c = Text[Items[i].End];
+        Text_unsafe[Items[i].End] = 0;
+        Append(&Text[LastEnd]);
+        LastEnd = Items[i].End;
+
+        Text_unsafe[Items[i].End] = c;
+        if (Items[i].Lex == LexCommand)
+            SetBold(false);
+    }
+    SetForecolor(BLACK);
 }
 
 void Output::Append(LPCTSTR Text)

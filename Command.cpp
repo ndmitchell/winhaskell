@@ -23,7 +23,7 @@ void Application::CommandRun()
 	input->SelAll();
 
 	output->FormatReset();
-    output->Append(Buffer);
+    output->AppendLex(Buffer);
     output->Append("\n");
     history->Add(Buffer);
 

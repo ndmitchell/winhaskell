@@ -140,6 +140,7 @@ bool Interpreter::Execute(Action* a)
         {
             String* s = GetType(a->Argument);
             output->AppendLex(s->Get());
+            output->Append("\n");
             delete s;
         }
         return false;
