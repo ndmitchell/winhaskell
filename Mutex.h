@@ -6,6 +6,12 @@ public:
     ~Mutex();
 
     void Lock();
+
+    //Lock without waiting
+    // true = success (locked)
+    // false = no change, is locked by someone else
+    bool LockImmediate();
+
     void Unlock();
 
 private:

@@ -3,6 +3,8 @@
 // Provides buffering
 // Lowest level, users subclass this
 
+class Mutex;
+
 const int ConsoleBufferSize = 1000;
 const int ConsoleTimeout = 100;
 
@@ -68,9 +70,7 @@ public:
 
 private:
 	//Lock
-	HANDLE hSemaphore;
-	void BeginLock();
-	void EndLock();
+	Mutex* mutex;
 
 	//Buffer
 	bool BufStdout;

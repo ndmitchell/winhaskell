@@ -1,6 +1,7 @@
 #include "Header.h"
 #include "Console.h"
 #include "Application.h"
+#include "Mutex.h"
 
 HANDLE CreateStreamConsole(bool Write, HANDLE* hUseless);
 
@@ -51,7 +52,7 @@ DWORD WINAPI ConsoleReadStdErr(LPVOID Param)
 
 Console::Console()
 {
-	hSemaphore = CreateSemaphore(NULL, 1, 1, NULL);
+	mutex = new Mutex();
 	BufSize = 0;
     ConsoleInit();
     Running = false;
@@ -59,7 +60,7 @@ Console::Console()
 
 Console::~Console()
 {
-	CloseHandle(hSemaphore);
+    delete mutex;
     if (Running)
         Abort();
 }
@@ -128,24 +129,14 @@ void Console::FlushBuffer()
 	}
 }
 
-void Console::BeginLock()
-{
-	WaitForSingleObject(hSemaphore, INFINITE);
-}
-
-void Console::EndLock()
-{
-	ReleaseSemaphore(hSemaphore, 1, NULL); 
-}
-
 bool Console::Tick()
 {
-	if (WaitForSingleObject(hSemaphore, 0) == WAIT_TIMEOUT)
+	if (!mutex->LockImmediate())
 		return false;
 	else
 	{
 		FlushBuffer();
-		EndLock();
+		mutex->Unlock();
 		return true;
 	}
 }
@@ -220,34 +211,34 @@ void Console::Internal_ReadHandle(bool Stdout)
 		if(!ReadFile(h, chBuf, 1, &dword,  NULL) || dword == 0)
 			break;
 
-		BeginLock();
+        {
+            Lock l(mutex);
 
-		if (chBuf[0] == '\b')
-		{
-			FlushBuffer();
-			Escape(conBackspace, Stdout);
-		}
-		else
-		{
-			if ((BufSize != 0 && Stdout != BufStdout) ||
-				(BufSize >= ConsoleBufferSize) ||
-				(BufSize != 0 && chBuf[0] == ConsoleEscapeChar))
-			{
-				app->DelTimer(this);
-				FlushBuffer();
-			}
-			bool AddTimer = (BufSize == 0);
-			BufStdout = Stdout;
-			Buffer[BufSize++] = chBuf[0];
+		    if (chBuf[0] == '\b')
+		    {
+			    FlushBuffer();
+			    Escape(conBackspace, Stdout);
+		    }
+		    else
+		    {
+			    if ((BufSize != 0 && Stdout != BufStdout) ||
+				    (BufSize >= ConsoleBufferSize) ||
+				    (BufSize != 0 && chBuf[0] == ConsoleEscapeChar))
+			    {
+				    app->DelTimer(this);
+				    FlushBuffer();
+			    }
+			    bool AddTimer = (BufSize == 0);
+			    BufStdout = Stdout;
+			    Buffer[BufSize++] = chBuf[0];
 
-			if (chBuf[0] == 'm' && Buffer[0] == ConsoleEscapeChar)
-				ProcessEscape();
+			    if (chBuf[0] == 'm' && Buffer[0] == ConsoleEscapeChar)
+				    ProcessEscape();
 
-			if (AddTimer)
-				app->AddTimer(this, ConsoleTimeout);
-		}
-
-		EndLock();
+			    if (AddTimer)
+				    app->AddTimer(this, ConsoleTimeout);
+		    }
+        }
 	} 
 }
 

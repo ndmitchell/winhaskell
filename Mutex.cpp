@@ -16,6 +16,11 @@ void Mutex::Lock()
     WaitForSingleObject(hSemaphore, INFINITE);
 }
 
+bool Mutex::LockImmediate()
+{
+    return (WaitForSingleObject(hSemaphore, 0) == WAIT_TIMEOUT);
+}
+
 void Mutex::Unlock()
 {
 	ReleaseSemaphore(hSemaphore, 1, NULL);
