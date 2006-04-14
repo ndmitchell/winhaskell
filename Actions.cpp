@@ -47,10 +47,7 @@ Action::Action(LPCTSTR Cmd)
 	Orig = strdup(Cmd);
 
     LPCTSTR c = Cmd;
-    while (isspace(*c))
-        c++;
-
-	if (c[0] == '!')
+    if (c[0] == '!')
 	{
 		Command = NULL;
 		Argument = strdup(&c[1]);
