@@ -280,21 +280,10 @@ BOOL MainDialogNotify(LPNMHDR nmhdr)
 
 void MainDialogDropFiles(HDROP hDrop)
 {
-    /*
-    char Command[MAX_PATH], File[MAX_PATH];
-
+    char File[MAX_PATH];
     DragQueryFile(hDrop, 0, File, MAX_PATH);
     DragFinish(hDrop);
-
-    //Move the current directory
-    //Happens automatically if they use the open dialog
-    //If they directly invoke :load then not necessary
-    //SetWorkingDir(File);
-
-    wsprintf(Command, ":load \"%s\"", File);
-    InputSet(Command);
-    FireCommand();
-    */
+    app->LoadFile(File);
 }
 
 VOID CALLBACK TimerFunc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
