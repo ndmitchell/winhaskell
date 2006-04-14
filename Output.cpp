@@ -340,16 +340,13 @@ Output::~Output()
 
 void Output::AppendLex(LPCTSTR Text)
 {
-    LPTSTR Text_unsafe = (LPTSTR) Text;
+    Lexer lex(Text);
 
     SelEnd();
-    LexItem Items[250];
-    int LexItems = GetLexemes(Text, Items, 250);
 
-    int LastEnd = 0;
-    for (int i = 0; i < LexItems; i++)
+    for (LexToken* lt = lex.Next(); lt != NULL; lt = lex.Next())
     {
-        switch (Items[i].Lex)
+        switch (lt->Lex)
         {
         case LexKeyword:
             SetForecolor(BLUE);
@@ -366,16 +363,12 @@ void Output::AppendLex(LPCTSTR Text)
         default:
             SetForecolor(BLACK);
         }
-        if (Items[i].Lex == LexCommand)
+        if (lt->Lex == LexCommand)
             SetBold(true);
 
-        char c = Text[Items[i].End];
-        Text_unsafe[Items[i].End] = 0;
-        Append(&Text[LastEnd]);
-        LastEnd = Items[i].End;
+        Append(lt->Str);
 
-        Text_unsafe[Items[i].End] = c;
-        if (Items[i].Lex == LexCommand)
+        if (lt->Lex == LexCommand)
             SetBold(false);
     }
     SetForecolor(BLACK);

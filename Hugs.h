@@ -6,6 +6,8 @@ public:
     ~Hugs(){};
 
     virtual void SetPrompt(LPCTSTR Command);
+    virtual bool IsError(LPCTSTR Result);
+    virtual void ErrorHints(LPCTSTR Text, LPCTSTR Result);
 };
 
 Hugs* StartHugs();

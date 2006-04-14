@@ -139,8 +139,17 @@ bool Interpreter::Execute(Action* a)
     case actType:
         {
             String* s = GetType(a->Argument);
-            output->AppendLex(s->Get());
-            output->Append("\n");
+            if (IsError(s->Get()))
+            {
+                output->SetForecolor(RED);
+                output->Append(s->Get());
+                ErrorHints(a->Orig, s->Get());
+            }
+            else
+            {
+                output->AppendLex(s->Get());
+                output->Append("\n");
+            }
             delete s;
         }
         return false;

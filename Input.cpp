@@ -18,7 +18,6 @@ Completion* CompFile = NULL;
 Completion* CompCode = NULL;
 
 Completion* Active = NULL;
-LexItem CompItem;
 
 
 INT_PTR CALLBACK InputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -65,6 +64,11 @@ void Input::SelAll()
     SendMessage(hRTF, EM_SETSEL, 0, -1);
 }
 
+void Input::Sel(int Start, int Length)
+{
+    SendMessage(hRTF, EM_SETSEL, Start, Start+Length);
+}
+
 void InputChanged(HWND hInput)
 {
     CHARRANGE cr;
@@ -74,8 +78,7 @@ void InputChanged(HWND hInput)
     GetWindowText(hInput, Buffer, MaxInputSize);
     int Length = GetWindowTextLength(hInput);
 
-    LexItem Items[250];
-    int LexItems = GetLexemes(Buffer, Items, 250);
+    Lexer lex(Buffer);
 
     CHARFORMAT cf;
     cf.cbSize = sizeof(cf);
@@ -83,24 +86,25 @@ void InputChanged(HWND hInput)
     cf.dwEffects = 0;
 
     //First do syntax colouring
-    for (int i = 0; i < LexItems; i++)
+    for (LexToken* lt = lex.Next(); lt != NULL; lt = lex.Next())
     {
-        SendMessage(hInput, EM_SETSEL, Items[i].Start, Items[i].End);
+        SendMessage(hInput, EM_SETSEL, lt->Start, lt->End);
 
         cf.dwEffects = 0;
-        if (Items[i].Lex == LexKeyword)
+        if (lt->Lex == LexKeyword)
             cf.crTextColor = BLUE;
-        else if (Items[i].Lex == LexOperator)
+        else if (lt->Lex == LexOperator)
             cf.crTextColor = RED;
-        else if (Items[i].Lex == LexString)
+        else if (lt->Lex == LexString)
             cf.crTextColor = CYAN;
         else
         {
             cf.crTextColor = BLACK;
-            if (Items[i].Lex == LexCommand)
+            if (lt->Lex == LexCommand)
                 cf.dwEffects = CFE_BOLD;
         }
-        SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
+        if (lt->Lex != LexWhitespace)
+            SendMessage(hInput, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf);
     }
 
     //Now make all mismatched brackets bold
@@ -161,6 +165,7 @@ void InputChanged(HWND hInput)
 
 void CompletionFinish(HWND hInput)
 {
+    /*
     TCHAR Buffer[100];
     Active->GetCurrent(Buffer);
 
@@ -169,6 +174,7 @@ void CompletionFinish(HWND hInput)
 
     Active->Hide();
     Active = NULL;
+    */
 }
 
 BOOL InputNotify(HWND hWnd, LPNMHDR nmhdr)
@@ -243,4 +249,3 @@ INT_PTR CALLBACK InputDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     }
     return FALSE;
 }
-

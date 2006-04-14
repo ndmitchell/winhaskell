@@ -27,6 +27,10 @@ public:
     // events provided by the child
     virtual void SetPrompt(LPCTSTR Prompt) = 0;
 
+    // is this message an error message
+    virtual bool IsError(LPCTSTR Result) = 0;
+    virtual void ErrorHints(LPCTSTR Input, LPCTSTR Result) = 0;
+
 	void Evaluate(LPCTSTR Expression);
 	//return false is execution could not be started
 	bool Execute(Action* a);
