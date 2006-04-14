@@ -35,6 +35,12 @@ void Application::DefaultCommand()
 void Application::RunningChanged(bool Running)
 {
     toolbar->RunningChanged(Running);
+    if (!Running)
+    {
+        output->FormatReset();
+        output->SetForecolor(GREEN);
+        output->Append(interpreter->GetLastPrompt());
+    }
 }
 
 void Application::Warning(LPCTSTR Text)

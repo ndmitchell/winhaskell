@@ -17,6 +17,7 @@ public:
 
 	// Standard output
     void Append(LPCTSTR Text);
+    void AppendLex(LPCTSTR Text){Append(Text);}
 
 	// Format buffering
 	void FormatReset();

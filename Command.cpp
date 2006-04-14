@@ -45,7 +45,12 @@ void Application::CommandRun()
 
 	default:
 		if (!interpreter->Execute(&a))
+        {
+            output->FormatReset();
+            output->SetForecolor(GREEN);
+            output->Append(interpreter->GetLastPrompt());
 			return;
+        }
 	}
 
     app->RunningChanged(true);

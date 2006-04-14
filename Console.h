@@ -12,7 +12,8 @@ const char ConsoleEscapeChar = 27;
 enum ConsoleEscape
 {
 	conBackspace = -1, //send backspace as Escape, since thats easier
-	conComplete = 50, //a custom escape character
+	conPromptBegin = 50, //a custom escape character
+    conPromptEnd = 51,
 	conReset = 0,
 	conBold = 1,
 	conUnderline = 4,

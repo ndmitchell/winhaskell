@@ -16,7 +16,7 @@ ActionItem Commands[] =
     {actKnown, "reload", ":reload, repeat last load command"},
     {actKnown, "edit", ":edit, <filename>, edit file"},
     {actKnown, "module", ":module <module>, set module for evaluating expressions"},
-    {actKnown, "type", ":type <expr>, print type of expression"},
+    {actType, "type", ":type <expr>, print type of expression"},
     {actKnown, "?", ":?, display this list of commands"},
     {actKnown, "set", ":set <options>, set command line options"},
     {actKnown, "names", ":names [pat], list names currently in scope"},

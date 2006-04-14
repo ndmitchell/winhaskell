@@ -136,10 +136,16 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\Mutex.cpp">
+			</File>
+			<File
 				RelativePath=".\Registry.cpp">
 			</File>
 			<File
 				RelativePath=".\StartCode.cpp">
+			</File>
+			<File
+				RelativePath=".\String.cpp">
 			</File>
 			<File
 				RelativePath=".\WrapHugs.cpp">
@@ -254,10 +260,16 @@
 				RelativePath=".\Lexer.h">
 			</File>
 			<File
+				RelativePath=".\Mutex.h">
+			</File>
+			<File
 				RelativePath=".\Registry.h">
 			</File>
 			<File
 				RelativePath=".\resource.h">
+			</File>
+			<File
+				RelativePath=".\String.h">
 			</File>
 			<File
 				RelativePath=".\ToolbarData.h">
@@ -301,10 +313,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">

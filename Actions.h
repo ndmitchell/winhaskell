@@ -9,6 +9,7 @@ enum Actions
 	actLoad,
 	actShell,
 	actQuit,
+    actType,
 	actKnown,
 };
 
