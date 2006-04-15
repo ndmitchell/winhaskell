@@ -148,7 +148,8 @@ bool Interpreter::Execute(Action* a)
             String* s = GetType(a->Argument);
             if (IsError(s->Get()))
             {
-                ShowError(a->Orig, s->Get());
+                if (!ShowError(a->Orig, s->Get()))
+                    output->AppendLex(a->Orig);
                 output->Append("\n");
                 output->SetForecolor(RED);
                 output->Append(s->Get());
