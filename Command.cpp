@@ -20,6 +20,13 @@ void Application::CommandRun()
 {
     TCHAR Buffer[500];
     input->Get(Buffer);
+
+	if (Buffer[0] == 0)
+	{
+		strcpy(Buffer, ":main");
+		input->Set(Buffer);
+	}
+
 	input->SelAll();
 
 	output->FormatReset();
