@@ -23,6 +23,7 @@ ActionItem Commands[] =
     {actKnown, "info", ":info <names>, describe named objects"},
     {actKnown, "browse", ":browse <modules>, browse names exported by <modules>"},
     {actKnown, "main", ":main <aruments>, run the main function with the given arguments"},
+	{ackRunProfile, "main-profile", ":main-profile <arguments>, run a program for profiling"},
     {actKnown, "find", ":find <name>, edit module containing definition of name"},
     {actKnown, "cd", ":cd dir, change directory"},
     {actKnown, "version", ":version, print Hugs version"},

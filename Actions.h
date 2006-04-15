@@ -10,6 +10,7 @@ enum Actions
 	actShell,
 	actQuit,
     actType,
+	ackRunProfile,
 	actKnown,
 };
 

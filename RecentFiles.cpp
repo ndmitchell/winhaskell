@@ -37,6 +37,11 @@ LPCTSTR RecentFiles::Get(int Id)
 	return NULL;
 }
 
+LPCTSTR RecentFiles::Last()
+{
+	return Items[0];
+}
+
 void RecentFiles::Add(LPCTSTR Item)
 {
     // if its already in the list move it to the top

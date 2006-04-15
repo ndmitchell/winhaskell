@@ -139,6 +139,9 @@
 				RelativePath=".\Mutex.cpp">
 			</File>
 			<File
+				RelativePath=".\Profile.cpp">
+			</File>
+			<File
 				RelativePath=".\Registry.cpp">
 			</File>
 			<File
@@ -263,6 +266,9 @@
 				RelativePath=".\Mutex.h">
 			</File>
 			<File
+				RelativePath=".\Profile.h">
+			</File>
+			<File
 				RelativePath=".\Registry.h">
 			</File>
 			<File
@@ -313,10 +319,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">

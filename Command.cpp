@@ -9,6 +9,7 @@
 #include "Command.h"
 #include "RecentFiles.h"
 #include "Actions.h"
+#include "Profile.h"
 
 void Application::CommandRun(LPCTSTR Command)
 {
@@ -42,6 +43,12 @@ void Application::CommandRun()
 
 	case actExpression:
 		interpreter->Expression(Buffer);
+		break;
+
+	case ackRunProfile:
+		output->AppendLex(a.Orig);
+		output->Append("\n");
+		ProfileRun(a.Argument);
 		break;
 
 	case actQuit:
@@ -106,6 +113,10 @@ void Application::FireCommand(Command c, int Param)
 
 	case cmdOpen:
 		CommandOpen();
+		break;
+
+	case cmdRunProfile:
+		CommandRun(":main-profile");
 		break;
 
     default:

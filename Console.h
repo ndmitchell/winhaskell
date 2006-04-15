@@ -47,8 +47,8 @@ public:
 	//and being written
 	//escape characters must come in their entirity in 0.1 seconds, or are ignored
 	//escape characters come at the front of a buffer only
-    virtual void Read(LPCTSTR Buffer, DWORD Size, bool Stdout) = 0;
-	virtual void Escape(ConsoleEscape Code, bool Stdout) = 0;
+    virtual void Read(LPCTSTR Buffer, DWORD Size, bool Stdout);
+	virtual void Escape(ConsoleEscape Code, bool Stdout);
 
     //Called when the computation has terminated
     virtual void Finished() = 0;

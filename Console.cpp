@@ -2,6 +2,8 @@
 #include "Console.h"
 #include "Application.h"
 #include "Mutex.h"
+#include "Output.h"
+
 
 HANDLE CreateStreamConsole(bool Write, HANDLE* hUseless);
 
@@ -70,6 +72,7 @@ void Console::Start(LPCTSTR Command)
     assert(!Running);
 
     Running = true;
+	BufSize = 0;
 
     HANDLE tStdin = CreateStreamConsole(false, &hStdin);
 	HANDLE tStdout = CreateStreamConsole(true, &hStdout);
@@ -127,6 +130,16 @@ void Console::FlushBuffer()
 		Read(Buffer, BufSize, BufStdout);
 		BufSize = 0;
 	}
+}
+
+void Console::Read(LPCTSTR Buffer, DWORD Size, bool Stdout)
+{
+	output->Append(Buffer);
+}
+
+void Console::Escape(ConsoleEscape Code, bool Stdout)
+{
+	output->Escape(Code);
 }
 
 bool Console::Tick()
@@ -239,7 +252,13 @@ void Console::Internal_ReadHandle(bool Stdout)
 				    app->AddTimer(this, ConsoleTimeout);
 		    }
         }
-	} 
+	}
+	{
+		Lock l(mutex);
+		FlushBuffer();
+		Running = false;
+	}
+	Finished();
 }
 
 

@@ -9,6 +9,7 @@ public:
 
     HMENU GetMenu();
     LPCTSTR Get(int Id);
+	LPCTSTR Last();
     void Add(LPCTSTR Item);
 
 private:

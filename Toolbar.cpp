@@ -264,7 +264,7 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         break;
 
     case WM_COMMAND:
-        app->FireCommand((Command) LOWORD(wParam), 0);
+        //app->FireCommand((Command) LOWORD(wParam), 0);
         break;
 
 	case WM_EXITMENULOOP:
