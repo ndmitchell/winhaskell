@@ -5,6 +5,11 @@
 #include "Icon.h"
 #include "Command.h"
 
+//Preference, hardcoded
+//TransparentToolbar looks nicer (much nicer)
+//but currently has visual glitches quite a lot
+const bool TransparentToolbar = false;
+
 
 /////////////////////////////////////////////////////////////////////
 // Data loading section
@@ -59,11 +64,13 @@ void Tab_End(Toolbar_Data* td, Toolbar* toolbar)
 {
     // Create the toolbar
     HWND hToolbar = CreateWindowEx(
-		WS_EX_TRANSPARENT,
+		(TransparentToolbar ? WS_EX_TRANSPARENT : 0),
 		TOOLBARCLASSNAME, NULL,
-        WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT |  TBSTYLE_TRANSPARENT | CCS_NODIVIDER | CCS_NOPARENTALIGN | TBSTYLE_LIST | CCS_NOMOVEY | CCS_NORESIZE,
+		(TransparentToolbar ? TBSTYLE_TRANSPARENT : 0) |
+        WS_CHILD | TBSTYLE_TOOLTIPS | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN | TBSTYLE_LIST | CCS_NOMOVEY | CCS_NORESIZE,
 		20, 40, 600, 50,
-        toolbar->hTab /*toolbar->hWnd*/, (HMENU) (int) 0, hInst, NULL);
+		(TransparentToolbar ? toolbar->hTab : toolbar->hWnd),
+		(HMENU) (int) 0, hInst, NULL);
 
 	SendMessage(hToolbar, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS);
 
@@ -137,7 +144,8 @@ Toolbar::Toolbar(HWND hParent)
 
 void Toolbar::RepaintTabs()
 {
-	InvalidateRect(hWnd, NULL, FALSE);
+	if (TransparentToolbar)
+		InvalidateRect(hWnd, NULL, FALSE);
 }
 
 void Toolbar::RunningChanged(bool Running)
@@ -177,7 +185,8 @@ void ToolbarResize()
     MoveWindow(toolbar->hTab, 5, 5, rc.right - 10, rc.bottom - 10, TRUE);
 
     int i = TabCtrl_GetCurSel(toolbar->hTab);
-    MoveWindow(toolbar->Tabs[i].hToolbar, 5, 25, rc.right - 20, 42, TRUE);
+	int Offset = (TransparentToolbar ? 0 : 5);
+    MoveWindow(toolbar->Tabs[i].hToolbar, Offset + 5, Offset + 25, rc.right - 20, 40, TRUE);
 }
 
 BOOL ToolbarNotify(LPNMHDR nmhdr)
@@ -259,7 +268,7 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         break;
 
 	case WM_EXITMENULOOP:
-		InvalidateRect(hWnd, NULL, TRUE);
+		toolbar->RepaintTabs();
 		break;
 
     case WM_SIZE:
