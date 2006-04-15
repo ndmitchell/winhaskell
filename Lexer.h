@@ -39,7 +39,7 @@ private:
     LexToken item;
 };
 
-class LexList: LexToken
+class LexList
 {
 public:
     int Length;

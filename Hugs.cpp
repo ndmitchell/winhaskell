@@ -29,10 +29,18 @@ bool Hugs::IsError(LPCTSTR Result)
     return (strncmp(Result, "ERROR ", 6) == 0);
 }
 
+bool IsPrefix(LPCTSTR Prefix, LPCTSTR Str)
+{
+    return (memcmp(Prefix, Str, strlen(Prefix)) == 0);
+}
+
 bool Hugs::ShowError(LPCTSTR Input, LPCTSTR Result)
 {
     LPCTSTR UndefVar = "ERROR - Undefined variable \"";
     int iUndefVar = (int) strlen(UndefVar);
+
+    LPCTSTR UntermStr = "ERROR - Improperly terminated string";
+    LPCTSTR UntermChr = "ERROR - Improperly terminated character constant";
 
     if (strncmp(Result, UndefVar, iUndefVar) == 0)
     {
@@ -49,6 +57,21 @@ bool Hugs::ShowError(LPCTSTR Input, LPCTSTR Result)
                 i->Lex = LexError;
         }
         NameEnd[0] = '\"';
+
+        output->AppendLex(&ll);
+        return true;
+    }
+    else if (IsPrefix(UntermStr, Result) || IsPrefix(UntermChr, Result))
+    {
+        Lexer lex(Input);
+        LexList ll(&lex);
+
+        for (LexList* i = &ll; i != NULL; i = i->Next)
+        {
+            if (i->Lex == LexString &&
+                (i->Length <= 1 || i->Str[0] != i->Str[i->Length-1]))
+                i->Lex = LexError;
+        }
 
         output->AppendLex(&ll);
         return true;

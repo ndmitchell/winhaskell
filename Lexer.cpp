@@ -104,7 +104,10 @@ void Lexer::Skip()
         for (Pos++; Copy[Pos] != 0; Pos++)
         {
             if (!LastEscape && Copy[Pos] == b)
+            {
+                Pos++;
                 break;
+            }
             LastEscape = (Copy[Pos] == '\\');
         }
     }
