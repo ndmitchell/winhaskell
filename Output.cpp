@@ -338,40 +338,53 @@ Output::~Output()
 {
 }
 
+void Output::AppendLexeme(Lexeme l, LPCTSTR Str)
+{
+    switch (l)
+    {
+    case LexKeyword:
+        SetForecolor(BLUE);
+        break;
+
+    case LexOperator: case LexError:
+        SetForecolor(RED);
+        break;
+
+    case LexString:
+        SetForecolor(CYAN);
+        break;
+
+    default:
+        SetForecolor(BLACK);
+    }
+    if (l == LexCommand)
+        SetBold(true);
+    else if (l == LexError)
+        SetUnderline(true);
+
+    Append(Str);
+
+    if (l == LexCommand)
+        SetBold(false);
+    else if (l == LexError)
+        SetUnderline(false);
+}
+
+void Output::AppendLex(LexList* ll)
+{
+    SelEnd();
+    for (LexList* i = ll; i != NULL; i = i->Next)
+        AppendLexeme(i->Lex, i->Str);
+    FormatReset();
+}
+
 void Output::AppendLex(LPCTSTR Text)
 {
     Lexer lex(Text);
-
     SelEnd();
-
     for (LexToken* lt = lex.Next(); lt != NULL; lt = lex.Next())
-    {
-        switch (lt->Lex)
-        {
-        case LexKeyword:
-            SetForecolor(BLUE);
-            break;
-
-        case LexOperator:
-            SetForecolor(RED);
-            break;
-
-        case LexString:
-            SetForecolor(CYAN);
-            break;
-
-        default:
-            SetForecolor(BLACK);
-        }
-        if (lt->Lex == LexCommand)
-            SetBold(true);
-
-        Append(lt->Str);
-
-        if (lt->Lex == LexCommand)
-            SetBold(false);
-    }
-    SetForecolor(BLACK);
+        AppendLexeme(lt->Lex, lt->Str);
+    FormatReset();
 }
 
 void Output::Append(LPCTSTR Text)

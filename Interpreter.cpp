@@ -111,6 +111,13 @@ String* Interpreter::GetType(LPCTSTR Expression)
     return OutputBuffer;
 }
 
+void Interpreter::Expression(LPCTSTR Expression)
+{
+    output->AppendLex(Expression);
+    output->Append("\n");
+    Evaluate(Expression);
+}
+
 bool Interpreter::Execute(Action* a)
 {
 	TCHAR Buffer[500];
@@ -141,12 +148,15 @@ bool Interpreter::Execute(Action* a)
             String* s = GetType(a->Argument);
             if (IsError(s->Get()))
             {
+                ShowError(a->Orig, s->Get());
+                output->Append("\n");
                 output->SetForecolor(RED);
                 output->Append(s->Get());
-                ErrorHints(a->Orig, s->Get());
             }
             else
             {
+                output->AppendLex(a->Orig);
+                output->Append("\n");
                 output->AppendLex(s->Get());
                 output->Append("\n");
             }
@@ -159,6 +169,8 @@ bool Interpreter::Execute(Action* a)
 		break;
 	}
 
+    output->AppendLex(a->Orig);
+    output->Append("\n");
 	Evaluate(Buffer);
 	return true;
 }

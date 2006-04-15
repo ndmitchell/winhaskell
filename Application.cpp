@@ -131,14 +131,6 @@ void MainDialogDropFiles(HDROP hDrop)
     app->LoadFile(File);
 }
 
-void Application::AddError(int Start, int Length, LPCTSTR Message)
-{
-    TCHAR Buffer[500];
-    wsprintf(Buffer, "Error: %i %i %s\n", Start, Length, Message);
-    //output->Append(Buffer);
-    input->Sel(Start, Length);
-}
-
 VOID CALLBACK TimerFunc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 	if (app->timeout->Tick())

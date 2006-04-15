@@ -1,5 +1,7 @@
 
 enum ConsoleEscape;
+enum Lexeme;
+class LexList;
 
 struct OutputFormat
 {
@@ -17,7 +19,9 @@ public:
 
 	// Standard output
     void Append(LPCTSTR Text);
+    void AppendLexeme(Lexeme l, LPCTSTR Str);
     void AppendLex(LPCTSTR Text);
+    void AppendLex(LexList* ll);
 
 	// Format buffering
 	void FormatReset();

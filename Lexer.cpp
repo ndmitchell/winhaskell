@@ -234,3 +234,40 @@ void MismatchedBrackets(LPTSTR Buffer)
 {
     ScanBrackets(Buffer, false);
 }
+
+// LEX LIST STUFF
+LexList::LexList()
+{
+}
+
+LexList::LexList(Lexer* lex)
+{
+    LexToken* lt = lex->Next();
+    if (lt == NULL)
+    {
+        Str = strdup("");
+        Length = 0;
+        Lex = LexWhitespace;
+        Next = NULL;
+    }
+    else
+    {
+        Str = strdup(lt->Str);
+        Length = lt->Length;
+        Lex = lt->Lex;
+        Next = new LexList(lex);
+    }
+}
+
+LexList::LexList(LexToken* lt)
+{
+    Str = strdup(lt->Str);
+    Length = lt->Length;
+    Lex = lt->Lex;
+}
+
+LexList::~LexList()
+{
+    free(Str);
+    if (Next != NULL) delete Next;
+}

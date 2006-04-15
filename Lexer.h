@@ -5,11 +5,13 @@ enum Lexeme {
     LexWhitespace,
     LexOther,
     LexString,
-    LexCommand
+    LexCommand,
+    LexError,
 };
 
-struct LexToken
+class LexToken
 {
+public:
     int Start;
     int End;
     int Length;
@@ -35,6 +37,21 @@ private:
 
     LPCTSTR* Depend;
     LexToken item;
+};
+
+class LexList: LexToken
+{
+public:
+    int Length;
+    Lexeme Lex;
+    LPTSTR Str;
+
+    LexList(Lexer* lex);
+    LexList(LexToken* lt);
+    LexList();
+
+    ~LexList();
+    LexList* Next;
 };
 
 void MismatchedBrackets(LPTSTR Buffer);

@@ -7,7 +7,7 @@ public:
 
     virtual void SetPrompt(LPCTSTR Command);
     virtual bool IsError(LPCTSTR Result);
-    virtual void ErrorHints(LPCTSTR Text, LPCTSTR Result);
+    virtual bool ShowError(LPCTSTR Input, LPCTSTR Result);
 };
 
 Hugs* StartHugs();

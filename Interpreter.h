@@ -29,12 +29,14 @@ public:
 
     // is this message an error message
     virtual bool IsError(LPCTSTR Result) = 0;
-    virtual void ErrorHints(LPCTSTR Input, LPCTSTR Result) = 0;
+    virtual bool ShowError(LPCTSTR Input, LPCTSTR Result){return false;};
 
-	void Evaluate(LPCTSTR Expression);
+	void Expression(LPCTSTR Expression);
 	//return false is execution could not be started
 	bool Execute(Action* a);
 
+protected:
+    void Evaluate(LPCTSTR Line);
 private:
     String* LastPrompt;
 

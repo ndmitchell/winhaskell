@@ -23,8 +23,6 @@ void Application::CommandRun()
 	input->SelAll();
 
 	output->FormatReset();
-    output->AppendLex(Buffer);
-    output->Append("\n");
     history->Add(Buffer);
 
 	Action a(Buffer);
@@ -36,7 +34,7 @@ void Application::CommandRun()
 		return;
 
 	case actExpression:
-		interpreter->Evaluate(Buffer);
+		interpreter->Expression(Buffer);
 		break;
 
 	case actQuit:

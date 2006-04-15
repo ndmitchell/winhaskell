@@ -28,8 +28,6 @@ public:
 	void StatusBar(LPCTSTR Text);
 	void Warning(LPCTSTR Text);
 
-    void AddError(int Start, int Length, LPCTSTR Message);
-
 //private:
 	Console* timeout;
 	UINT TimerId;

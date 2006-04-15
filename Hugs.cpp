@@ -2,6 +2,8 @@
 #include "Console.h"
 #include "Interpreter.h"
 #include "Hugs.h"
+#include "Output.h"
+#include "Lexer.h"
 #include "Application.h"
 
 
@@ -27,7 +29,7 @@ bool Hugs::IsError(LPCTSTR Result)
     return (strncmp(Result, "ERROR ", 6) == 0);
 }
 
-void Hugs::ErrorHints(LPCTSTR Input, LPCTSTR Result)
+bool Hugs::ShowError(LPCTSTR Input, LPCTSTR Result)
 {
     LPCTSTR UndefVar = "ERROR - Undefined variable \"";
     int iUndefVar = (int) strlen(UndefVar);
@@ -38,10 +40,20 @@ void Hugs::ErrorHints(LPCTSTR Input, LPCTSTR Result)
         LPTSTR NameEnd = strchr(Name, '\"');
         NameEnd[0] = 0;
 
-        LPTSTR Pos = strstr(Input, Name);
+        Lexer lex(Input);
+        LexList ll(&lex);
+
+        for (LexList* i = &ll; i != NULL; i = i->Next)
+        {
+            if (strcmp(i->Str, Name) == 0)
+                i->Lex = LexError;
+        }
         NameEnd[0] = '\"';
 
-        app->AddError(Pos - Input, NameEnd - Name, "Undefined variable");
+        output->AppendLex(&ll);
+        return true;
     }
+    else
+        return false;
 }
 
