@@ -23,4 +23,6 @@ public:
 
     ToolbarTab Tabs[20];
     int TabCount;
+
+	void RepaintTabs();
 };

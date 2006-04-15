@@ -135,6 +135,11 @@ Toolbar::Toolbar(HWND hParent)
     RunningChanged(false);
 };
 
+void Toolbar::RepaintTabs()
+{
+	InvalidateRect(hWnd, NULL, FALSE);
+}
+
 void Toolbar::RunningChanged(bool Running)
 {
     TBBUTTONINFO tbi;
@@ -153,6 +158,7 @@ void Toolbar::RunningChanged(bool Running)
             SendMessage(Tabs[i].hToolbar, TB_SETBUTTONINFO, Enable, (LPARAM) &tbi);
         }
     }
+	RepaintTabs();
 }
 
 Command Toolbar::DefaultCommand()
@@ -233,6 +239,10 @@ BOOL ToolbarNotify(LPNMHDR nmhdr)
             }
         }
     }
+	else if (nmhdr->code == TBN_HOTITEMCHANGE)
+	{
+		toolbar->RepaintTabs();
+	}
 	return FALSE;
 }
 
@@ -247,6 +257,10 @@ INT_PTR CALLBACK ToolbarDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     case WM_COMMAND:
         app->FireCommand((Command) LOWORD(wParam), 0);
         break;
+
+	case WM_EXITMENULOOP:
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
 
     case WM_SIZE:
         ToolbarResize();
