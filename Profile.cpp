@@ -16,9 +16,7 @@ void Profile::Finished()
 {
 	if (State == 0)
 	{
-		output->SetForecolor(BLUE);
 		output->Append("Finished compiling\n");
-		output->SetForecolor(BLUE);
 		output->Append("Executing for profiling\n");
 
 		State = 1;
@@ -29,6 +27,7 @@ void Profile::Finished()
 	}
 	else if (State == 1)
 	{
+		output->SetForecolor(BLUE);
 		output->Append("Finished executing\n");
 		app->RunningChanged(false);
 	}
@@ -44,7 +43,6 @@ bool ProfileRun(LPCTSTR Arguments)
 
 	output->SetForecolor(BLUE);
 	output->Append("Compiling for profiling (with GHC)\n");
-	output->SetForecolor(BLUE);
 
 	LPTSTR x = strdup(recentFiles->Last());
 	LPTSTR c = (x[0] == '\"' ? &x[1] : x);
