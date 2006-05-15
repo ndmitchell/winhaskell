@@ -34,12 +34,15 @@ void Application::CommandRun()
     history->Add(Buffer);
 
 	Action a(Buffer);
+
+	bool Success = true;
 	
 	switch (a.Code)
 	{
 	case actUnknown: case actBlank: case actShell:
 		Warning("I don't know how to execute this command...");
-		return;
+		Success = false;
+		break;
 
 	case actExpression:
 		interpreter->Expression(Buffer);
@@ -48,8 +51,7 @@ void Application::CommandRun()
 	case ackRunProfile:
 		output->AppendLex(a.Orig);
 		output->Append("\n");
-		if (!ProfileRun(a.Argument))
-			return;
+		Success = ProfileRun(a.Argument);
 		break;
 
 	case actQuit:
@@ -57,16 +59,13 @@ void Application::CommandRun()
 		return;
 
 	default:
-		if (!interpreter->Execute(&a))
-        {
-            output->FormatReset();
-            output->SetForecolor(GREEN);
-            output->Append(interpreter->GetLastPrompt());
-			return;
-        }
+		Success = interpreter->Execute(&a);
 	}
 
-    app->RunningChanged(true);
+	if (Success)
+		app->RunningChanged(true);
+	else
+		app->ShowPrompt();
 }
 
 void Application::LoadFile(LPCTSTR File)

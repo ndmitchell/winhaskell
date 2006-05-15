@@ -36,11 +36,14 @@ void Application::RunningChanged(bool Running)
 {
     toolbar->RunningChanged(Running);
     if (!Running)
-    {
-        output->FormatReset();
-        output->SetForecolor(GREEN);
-        output->Append(interpreter->GetLastPrompt());
-    }
+		ShowPrompt();
+}
+
+void Application::ShowPrompt()
+{
+    output->FormatReset();
+    output->SetForecolor(GREEN);
+    output->Append(interpreter->GetLastPrompt());
 }
 
 void Application::Warning(LPCTSTR Text)
@@ -48,7 +51,7 @@ void Application::Warning(LPCTSTR Text)
 	OutputFormat of;
 	output->FormatGet(&of);
 	output->SetForecolor(RED);
-	output->Append("\nWarning: ");
+	output->Append("Warning: ");
 	output->Append(Text);
 	output->Append("\n");
 	output->FormatSet(&of);
@@ -156,7 +159,7 @@ INT_PTR CALLBACK MainDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	    break;
 
 	case WM_USER:
-		app->TimerId = SetTimer(NULL, 0, (UINT) wParam, TimerFunc);
+		app->TimerId = (UINT) SetTimer(NULL, 0, (UINT) wParam, TimerFunc);
 		break;
 
 	case WM_CLOSE:

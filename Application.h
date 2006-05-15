@@ -27,6 +27,7 @@ public:
 
 	void StatusBar(LPCTSTR Text);
 	void Warning(LPCTSTR Text);
+	void ShowPrompt();
 
 //private:
 	Console* timeout;
