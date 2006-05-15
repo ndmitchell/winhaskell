@@ -21,7 +21,7 @@ void Profile::Finished()
 
 		State = 1;
 		TCHAR Buffer[500];
-		wsprintf(Buffer, "Main +RTS -p -RTS %s", Arguments);
+		wsprintf(Buffer, "Main +RTS -hc -p -RTS %s", Arguments);
 		output->SetForecolor(BLACK);
 		Start(Buffer);
 	}
