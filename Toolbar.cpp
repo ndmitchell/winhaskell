@@ -152,13 +152,13 @@ void Toolbar::RunningChanged(bool Running)
 {
     TBBUTTONINFO tbi;
     tbi.cbSize = sizeof(tbi);
-    tbi.dwMask = TBIF_STATE;
+    tbi.dwMask = TBIF_STATE | TBIF_BYINDEX;
     for (int i = 0; i < TabCount; i++)
     {
         if (Tabs[i].HasRunStop)
         {
-            int Enable  =  Running ? cmdStop : cmdRun;
-            int Disable = !Running ? cmdStop : cmdRun;
+            int Enable  =  Running ? 1 : 0;
+            int Disable = !Running ? 1 : 0;
 
             tbi.fsState = 0;
             SendMessage(Tabs[i].hToolbar, TB_SETBUTTONINFO, Disable, (LPARAM) &tbi);
