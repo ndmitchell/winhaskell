@@ -1,5 +1,5 @@
 
-class Hugs: Interpreter
+class Hugs: public Interpreter
 {
 public:
     Hugs(LPCTSTR Command){Begin(Command);};

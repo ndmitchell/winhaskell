@@ -19,21 +19,23 @@ public:
 
     void Begin(LPCTSTR Command);
     void AbortComputation();
-    LPCTSTR GetLastPrompt();
+    virtual LPCTSTR GetLastPrompt();
 
     // Some useful wrappers
     String* GetType(LPCTSTR Expression);
 
     // events provided by the child
-    virtual void SetPrompt(LPCTSTR Prompt) = 0;
+	virtual void SetPrompt(LPCTSTR Prompt){};
 
     // is this message an error message
-    virtual bool IsError(LPCTSTR Result) = 0;
+	virtual bool IsError(LPCTSTR Result){return false;};
     virtual bool ShowError(LPCTSTR Input, LPCTSTR Result){return false;};
 
-	void Expression(LPCTSTR Expression);
+	// Run an expression
+	virtual bool Expression(LPCTSTR Expression);
+
 	//return false is execution could not be started
-	bool Execute(Action* a);
+	virtual bool Execute(Action* a);
 
 protected:
     void Evaluate(LPCTSTR Line);

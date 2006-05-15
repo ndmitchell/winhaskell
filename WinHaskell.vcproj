@@ -165,6 +165,12 @@
 				<File
 					RelativePath=".\Hugs.h">
 				</File>
+				<File
+					RelativePath=".\NullEval.cpp">
+				</File>
+				<File
+					RelativePath=".\NullEval.h">
+				</File>
 			</Filter>
 			<Filter
 				Name="Console"
@@ -310,10 +316,10 @@
 				RelativePath=".\resource\toolbar_dis.bmp">
 			</File>
 			<File
-				RelativePath=".\up.ico">
+				RelativePath=".\resource\up.ico">
 			</File>
 			<File
-				RelativePath=".\resource\up.ico">
+				RelativePath=".\up.ico">
 			</File>
 			<File
 				RelativePath=".\resource\winhaskell.ico">

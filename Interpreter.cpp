@@ -111,11 +111,12 @@ String* Interpreter::GetType(LPCTSTR Expression)
     return OutputBuffer;
 }
 
-void Interpreter::Expression(LPCTSTR Expression)
+bool Interpreter::Expression(LPCTSTR Expression)
 {
     output->AppendLex(Expression);
     output->Append("\n");
     Evaluate(Expression);
+	return true;
 }
 
 bool Interpreter::Execute(Action* a)

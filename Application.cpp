@@ -7,6 +7,7 @@
 #include "Console.h"
 #include "Interpreter.h"
 #include "Hugs.h"
+#include "NullEval.h"
 #include "History.h"
 #include "Lexer.h"
 #include "RecentFiles.h"
@@ -24,7 +25,15 @@ Application::Application()
 
     recentFiles = new RecentFiles();
     history = new History();
-    interpreter = (Interpreter*) StartHugs();
+
+    interpreter = StartHugs();
+	
+	if (interpreter == NULL)
+	{
+		app->Warning("Failed to find hugs, see http://haskell.org/hugs/");
+		interpreter = StartNullEval();
+		app->ShowPrompt();
+	}
 }
 
 void Application::DefaultCommand()

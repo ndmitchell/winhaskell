@@ -45,7 +45,7 @@ void Application::CommandRun()
 		break;
 
 	case actExpression:
-		interpreter->Expression(Buffer);
+		Success = interpreter->Expression(Buffer);
 		break;
 
 	case ackRunProfile:
