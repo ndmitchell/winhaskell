@@ -121,6 +121,7 @@ void Application::FireCommand(Command c, int Param)
 
     default:
 		Warning("Command not handled, give me mon£y to implement this");
+        ShowPrompt();
     }
 }
 
