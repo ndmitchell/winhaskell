@@ -332,6 +332,8 @@ Output::Output(HWND hParent)
 	strcpy(cf.szFaceName, "Courier New");
 	cf.yHeight = 200;
     SendMessage(hRTF, EM_SETCHARFORMAT, SCF_ALL, (LPARAM) &cf);
+
+	FormatReset();
 }
 
 Output::~Output()
@@ -390,6 +392,7 @@ void Output::AppendLex(LPCTSTR Text)
 void Output::Append(LPCTSTR Text)
 {
 	SelEnd();
+	SelFormat();
 	SendMessage(hRTF, EM_REPLACESEL, FALSE, (LPARAM) Text);
 
 	/*
@@ -422,45 +425,37 @@ void Output::SelEnd()
 	SendMessage(hRTF, EM_SETSEL, -1, -1);
 }
 
-void Output::SetCharFormat(CHARFORMAT* cf, DWORD Mask)
+void Output::SelFormat()
 {
-	cf->cbSize = sizeof(CHARFORMAT);
-	cf->dwMask = Mask;
-	SelEnd();
-	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) cf);
+	CHARFORMAT2 cf2;
+	cf2.cbSize = sizeof(cf2);
+	cf2.dwEffects =
+		(CurrentFormat.Bold ? CFE_BOLD : 0) |
+		(CurrentFormat.Underline ? CFE_UNDERLINE : 0);
+	cf2.dwMask = CFM_BOLD | CFM_UNDERLINE | CFM_COLOR | CFM_BACKCOLOR;
+	cf2.crBackColor = CurrentFormat.BackColor;
+	cf2.crTextColor = CurrentFormat.ForeColor;
+	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
 }
 
 void Output::SetBold(bool Bold)
 {
-	CHARFORMAT cf;
-	cf.dwEffects = (Bold ? CFE_BOLD : 0);
-	SetCharFormat(&cf, CFM_BOLD);
+	CurrentFormat.Bold = Bold;
 }
 
 void Output::SetUnderline(bool Underline)
 {
-	CHARFORMAT cf;
-	cf.dwEffects = (Underline ? CFE_UNDERLINE : 0);
-	SetCharFormat(&cf, CFM_UNDERLINE);
+	CurrentFormat.Underline = Underline;
 }
 
 void Output::SetForecolor(int Color)
 {
-	CHARFORMAT cf;
-	cf.dwEffects = 0;
-	cf.crTextColor = Color;
-	SetCharFormat(&cf, CFM_COLOR);
+	CurrentFormat.ForeColor = Color;
 }
 
 void Output::SetBackcolor(int Color)
 {
-	CHARFORMAT2 cf2;
-	cf2.cbSize = sizeof(cf2);
-	cf2.dwMask = CFM_BACKCOLOR;
-	cf2.dwEffects = 0;
-	cf2.crBackColor = Color;
-	SelEnd();
-	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
+	CurrentFormat.BackColor = Color;
 }
 
 void Output::Escape(ConsoleEscape Code)
@@ -485,35 +480,18 @@ void Output::Escape(ConsoleEscape Code)
 
 void Output::FormatReset()
 {
-	OutputFormat of;
-	of.ForeColor = BLACK;
-	of.BackColor = WHITE;
-	of.Bold = false;
-	of.Underline = false;
-	FormatSet(&of);
+	CurrentFormat.ForeColor = BLACK;
+	CurrentFormat.BackColor = WHITE;
+	CurrentFormat.Bold = false;
+	CurrentFormat.Underline = false;
 }
 
 void Output::FormatSet(OutputFormat* of)
 {
-	CHARFORMAT2 cf2;
-	cf2.cbSize = sizeof(cf2);
-	cf2.dwEffects = (of->Bold ? CFE_BOLD : 0) | (of->Underline ? CFE_UNDERLINE : 0);
-	cf2.dwMask = CFM_BOLD | CFM_UNDERLINE | CFM_COLOR | CFM_BACKCOLOR;
-	cf2.crBackColor = of->BackColor;
-	cf2.crTextColor = of->ForeColor;
-	SelEnd();
-	SendMessage(hRTF, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
+	memcpy(&CurrentFormat, of, sizeof(OutputFormat));
 }
 
 void Output::FormatGet(OutputFormat* of)
 {
-	CHARFORMAT2 cf2;
-	cf2.cbSize = sizeof(cf2);
-	cf2.dwMask = CFM_BOLD | CFM_UNDERLINE | CFM_COLOR | CFM_BACKCOLOR;
-	SelEnd();
-	SendMessage(hRTF, EM_GETCHARFORMAT, SCF_SELECTION, (LPARAM) &cf2);
-	of->ForeColor = cf2.crTextColor;
-	of->BackColor = cf2.crBackColor;
-	of->Bold = (cf2.dwEffects & CFM_BOLD ? true : false);
-	of->Underline = (cf2.dwEffects & CFM_UNDERLINE ? true : false);
+	memcpy(of, &CurrentFormat, sizeof(OutputFormat));
 }

@@ -42,10 +42,11 @@ public:
     //Move back one character
 	void Rewind(){};
 
-	void SelEnd();
-
 // private:
-	void SetCharFormat(CHARFORMAT* cf, DWORD Mask);
+	void SelEnd();
+	void SelFormat();
+
+	OutputFormat CurrentFormat;
 
 	int Length;
 
