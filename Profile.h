@@ -1,4 +1,5 @@
 
 
-void ProfileRun(LPCTSTR Arguments);
+// Did executing of profiling stuff begin
+bool ProfileRun(LPCTSTR Arguments);
 void ProfileView();

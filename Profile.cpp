@@ -31,8 +31,14 @@ void Profile::Finished()
 	}
 }
 
-void ProfileRun(LPCTSTR Arguments)
+bool ProfileRun(LPCTSTR Arguments)
 {
+	if (recentFiles->Last() == NULL)
+	{
+		app->Warning("Error, must load a file before running profile");
+		return false;
+	}
+
 	output->Append("Compiling for profiling (with GHC)\n");
 
 	LPTSTR x = strdup(recentFiles->Last());
@@ -49,6 +55,7 @@ void ProfileRun(LPCTSTR Arguments)
 	p->State = 0;
 	p->Arguments = strdup(Arguments);
 	p->Start(Buffer);
+	return true;
 }
 
 void ProfileView()

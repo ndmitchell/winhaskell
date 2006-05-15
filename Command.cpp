@@ -48,7 +48,8 @@ void Application::CommandRun()
 	case ackRunProfile:
 		output->AppendLex(a.Orig);
 		output->Append("\n");
-		ProfileRun(a.Argument);
+		if (!ProfileRun(a.Argument))
+			return;
 		break;
 
 	case actQuit:
