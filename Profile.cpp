@@ -16,12 +16,15 @@ void Profile::Finished()
 {
 	if (State == 0)
 	{
+		output->SetForecolor(BLUE);
 		output->Append("Finished compiling\n");
+		output->SetForecolor(BLUE);
 		output->Append("Executing for profiling\n");
 
 		State = 1;
 		TCHAR Buffer[500];
 		wsprintf(Buffer, "Main +RTS -p -RTS %s", Arguments);
+		output->SetForecolor(BLACK);
 		Start(Buffer);
 	}
 	else if (State == 1)
@@ -39,11 +42,14 @@ bool ProfileRun(LPCTSTR Arguments)
 		return false;
 	}
 
+	output->SetForecolor(BLUE);
 	output->Append("Compiling for profiling (with GHC)\n");
+	output->SetForecolor(BLUE);
 
 	LPTSTR x = strdup(recentFiles->Last());
 	LPTSTR c = (x[0] == '\"' ? &x[1] : x);
-	strrchr(c, '\\')[0] = 0;
+	LPTSTR b = strrchr(c, '\\');
+	if (b != NULL) b[0] = 0;
 	SetCurrentDirectory(c);
 	free(x);
 
