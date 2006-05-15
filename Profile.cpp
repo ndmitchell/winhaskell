@@ -65,3 +65,7 @@ bool ProfileRun(LPCTSTR Arguments)
 void ProfileView()
 {
 }
+
+void ProfileAbort()
+{
+}

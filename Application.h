@@ -33,6 +33,7 @@ public:
 	Console* timeout;
 	UINT TimerId;
     HWND hWnd;
+    int Running;
 
     HWND hStatus;
 };

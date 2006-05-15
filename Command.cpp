@@ -104,11 +104,15 @@ void Application::FireCommand(Command c, int Param)
     switch (c)
     {
     case cmdRun:
+        Running = 0;
 		CommandRun();
         break;
 
     case cmdStop:
-        interpreter->AbortComputation();
+        if (Running == 0)
+            interpreter->AbortComputation();
+        else
+            ProfileAbort();
         break;
 
 	case cmdOpen:
@@ -116,6 +120,7 @@ void Application::FireCommand(Command c, int Param)
 		break;
 
 	case cmdRunProfile:
+        Running = 1;
 		CommandRun(":main-profile");
 		break;
 
